@@ -17,15 +17,12 @@ public:
 SomeClass *getC() {
     return new SomeClass{2};
 }
-//////////////////////////////////////////////////////////////////////
+
+
 
 
 int main() {
-    ///
-    std::cout << "Hello, world!\n";
-    std::array<int, 100> v{};
-    int nr;
-    std::cout << "Introduceți nr: ";
+
     /////////////////////////////////////////////////////////////////////////
     /// Observație: dacă aveți nevoie să citiți date de intrare de la tastatură,
     /// dați exemple de date de intrare folosind fișierul tastatura.txt
@@ -45,18 +42,7 @@ int main() {
     /// Impun această cerință ca să învățați să faceți un demo și să arătați părțile din
     /// program care merg (și să le evitați pe cele care nu merg).
     ///
-    /////////////////////////////////////////////////////////////////////////
-    std::cin >> nr;
-    /////////////////////////////////////////////////////////////////////////
-    for(int i = 0; i < nr; ++i) {
-        std::cout << "v[" << i << "] = ";
-        std::cin >> v[i];
-    }
-    std::cout << "\n\n";
-    std::cout << "Am citit de la tastatură " << nr << " elemente:\n";
-    for(int i = 0; i < nr; ++i) {
-        std::cout << "- " << v[i] << "\n";
-    }
+
     ///////////////////////////////////////////////////////////////////////////
     /// Pentru date citite din fișier, NU folosiți tastatura.txt. Creați-vă voi
     /// alt fișier propriu cu ce alt nume doriți.
@@ -79,9 +65,8 @@ int main() {
     sf::RenderWindow window;
     ///////////////////////////////////////////////////////////////////////////
     /// NOTE: sync with env variable APP_WINDOW from .github/workflows/cmake.yml:31
-    window.create(sf::VideoMode({800, 700}), "My Window", sf::Style::Default);
-    ///////////////////////////////////////////////////////////////////////////
-    //
+    window.create(sf::VideoMode({800, 700}), "Minesweeper++", sf::Style::Default);
+
     ///////////////////////////////////////////////////////////////////////////
     /// NOTE: mandatory use one of vsync or FPS limit (not both)            ///
     /// This is needed so we do not burn the GPU                            ///
