@@ -12,11 +12,14 @@
 /// This class is used to test that the memory leak checks work as expected even when using a GUI
 class SomeClass {
 public:
-    explicit SomeClass(int) {}
+    explicit SomeClass(int)
+    {
+    }
 };
 
 
-class Cell {
+class Cell
+{
 private:
     bool hasMine;
     bool isRevealed;
@@ -24,14 +27,21 @@ private:
     int adjacentMines;
 
 public:
-    explicit Cell(const bool hasMine = false) : hasMine(hasMine), isRevealed(false), isFlagged(false), adjacentMines(0) {}
+    explicit Cell(const bool hasMine = false) : hasMine(hasMine), isRevealed(false), isFlagged(false), adjacentMines(0)
+    {
+    }
 
-    ~Cell(){}
+    ~Cell()
+    {
+    }
 
     Cell(const Cell& other) : hasMine(other.hasMine), isRevealed(other.isRevealed), isFlagged(other.isFlagged),
-                              adjacentMines(other.adjacentMines) {}
+                              adjacentMines(other.adjacentMines)
+    {
+    }
 
-    Cell& operator=(const Cell& other) {
+    Cell& operator=(const Cell& other)
+    {
         if (this == &other)
             return *this;
         hasMine = other.hasMine;
@@ -41,52 +51,72 @@ public:
         return *this;
     }
 
-    friend std::ostream& operator<<(std::ostream& os, const Cell& cell) {
-        if (cell.isRevealed){
-            if (cell.hasMine){
+    friend std::ostream& operator<<(std::ostream& os, const Cell& cell)
+    {
+        if (cell.isRevealed)
+        {
+            if (cell.hasMine)
+            {
                 os << "*";
             }
             else os << cell.adjacentMines;
-        } else if (cell.isFlagged){
+        }
+        else if (cell.isFlagged)
+        {
             os << "F";
-        } else os << "#";
+        }
+        else os << "#";
         return os;
     }
 };
 
-class Minefield {
+class Minefield
+{
 private:
     int rows, cols, mineCount;
     std::vector<std::vector<Cell>> grid;
 
 public:
     Minefield(const int rows, const int cols, const int mineCount) : rows(rows), cols(cols), mineCount(mineCount),
-                                                                     grid(rows, std::vector<Cell>(cols)) {}
-    friend std::ostream& operator<<(std::ostream& os, const Minefield& minefield) {
-        for (int i = 0; i < minefield.rows; i++) {
-            for (int j = 0; j < minefield.cols; j++) {
+                                                                     grid(rows, std::vector<Cell>(cols))
+    {
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const Minefield& minefield)
+    {
+        for (int i = 0; i < minefield.rows; i++)
+        {
+            for (int j = 0; j < minefield.cols; j++)
+            {
                 os << minefield.grid[i][j] << " ";
-            } os << std::endl;
+            }
+            os << std::endl;
         }
         return os;
     }
 };
 
-class Player {
+class Player
+{
 private:
     std::string nickname;
     int highscore;
 
 public:
-    explicit Player(const std::string& nickname) : nickname(nickname), highscore(0){}
-    friend std::ostream& operator<<(std::ostream& os, const Player& player) {
+    explicit Player(const std::string& nickname) : nickname(nickname), highscore(0)
+    {
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const Player& player)
+    {
         os << player.nickname << " " << player.highscore;
         return os;
     }
 };
 
 
-class Game {
+class Game
+{
 private:
     Minefield minefield;
     Player player;
@@ -95,23 +125,30 @@ private:
 public:
     // Game(const int rows, const int cols, const int mineCount, const std::string& nickname): field(rows, cols, mineCount), player(nickname), gameOver(false) {}
     Game(const Minefield& minefield, const Player& player) : minefield(minefield), player(player),
-                                                                         gameOver(false) {}
-    friend std::ostream& operator<<(std::ostream& os, const Game& game) {
+                                                             gameOver(false)
+    {
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const Game& game)
+    {
         os << "Player: " << game.player << std::endl;
         os << "Minefield: \n" << game.minefield << std::endl;
-        if (game.gameOver) {
+        if (game.gameOver)
+        {
             os << "Game Over" << std::endl;
         }
         return os;
     }
 };
 
-SomeClass* getC() {
+SomeClass* getC()
+{
     return new SomeClass{2};
 }
 
 
-int main() {
+int main()
+{
     // Minefield minefield(8,8,10);
     // Player player("Bogdan");
     // Game game(minefield, player);
