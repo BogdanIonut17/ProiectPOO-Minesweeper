@@ -84,6 +84,7 @@ public:
 
     friend std::ostream& operator<<(std::ostream& os, const Minefield& minefield)
     {
+        std::cout << "Total number of mines: " << minefield.mineCount << std::endl;
         for (int i = 0; i < minefield.rows; i++)
         {
             for (int j = 0; j < minefield.cols; j++)
