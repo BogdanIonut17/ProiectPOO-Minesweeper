@@ -2,11 +2,12 @@
 // #include <array>
 #include <chrono>
 #include <thread>
-
+#include <ctime>
 #include <SFML/Graphics.hpp>
 
 #include <Helper.h>
 #include <ostream>
+#include <random>
 
 //////////////////////////////////////////////////////////////////////
 /// This class is used to test that the memory leak checks work as expected even when using a GUI
@@ -53,22 +54,49 @@ public:
 
     friend std::ostream& operator<<(std::ostream& os, const Cell& cell)
     {
-        if (cell.isRevealed)
-        {
-            if (cell.hasMine)
+        if (cell.isRevealed) {
+            if (cell.hasMine) os << "*";
+            else if (cell.adjacentMines)
             {
-                os << "*";
+                os << cell.adjacentMines;
             }
-            else os << cell.adjacentMines;
+            else
+                os << ".";
         }
-        else if (cell.isFlagged)
-        {
+        else if (cell.isFlagged) {
             os << "F";
         }
-        else os << "#";
+        else {
+            os << "#";
+        }
         return os;
     }
+
+    bool isMine() const {
+       return hasMine;
+    }
+
+    bool checkIfRevealed() const
+    {
+        return isRevealed;
+    }
+
+    void reveal()
+    {
+        isRevealed = true;
+    }
+
+    void toggleFlag()
+    {
+        isFlagged = !isFlagged;
+    }
+
+    void setAdjacentMines(int adjacent_mines) {
+        adjacentMines = adjacent_mines;
+    }
 };
+
+class Game;
 
 class Minefield
 {
@@ -78,8 +106,90 @@ private:
 
 public:
     Minefield(const int rows, const int cols, const int mineCount) : rows(rows), cols(cols), mineCount(mineCount),
-                                                                     grid(rows, std::vector<Cell>(cols))
+                                                                     grid(rows, std::vector<Cell>(cols)) {}
+
+    void generateMines() {
+        // srand(time(0));
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<int> distRow(0,rows-1);
+        std::uniform_int_distribution<int> distCol(0, cols - 1);
+        int minesPlaced=0;
+        while (minesPlaced < mineCount) {
+            int mine_x = distRow(gen);
+            int mine_y = distCol(gen);
+            if (!grid[mine_x][mine_y].isMine()){
+                grid[mine_x][mine_y]= Cell(true);
+                minesPlaced ++;
+            }
+        }
+    }
+
+    void countAdjacentMines()
     {
+        for (int i = 0; i < rows; i++)
+        {
+            for (int j = 0; j < cols; j++)
+            {
+                if (grid[i][j].isMine()) continue;
+                int count=0;
+                for (int dx=-1; dx<=1; dx++)
+                {
+                    for (int dy=-1; dy<=1; dy++)
+                    {
+                        int x = i+dx, y = j+dy;
+                        if (isValidMove(x, y) && grid[x][y].isMine())
+                            count++;
+                    }
+                }
+                grid[i][j].setAdjacentMines(count);
+            }
+        }
+    }
+
+    void revealCell(const int cell_x, const int cell_y)
+    {
+        if (!grid[cell_x][cell_y].checkIfRevealed())
+        {
+            grid[cell_x][cell_y].reveal();
+            if (!grid[cell_x][cell_y].isMine())
+                for (int dx=-1; dx<=1; dx++)
+                {
+                for (int dy=-1; dy<=1; dy++)
+                {
+                    int x = cell_x+dx, y = cell_y+dy;
+                    if (isValidMove(x, y) && !grid[x][y].isMine())
+                        grid[x][y].reveal();
+                }
+                }
+        }
+
+    }
+
+    void flagCell(const int x, const int y)
+    {
+            grid[x][y].toggleFlag();
+    }
+
+    bool isValidMove(const int x, const int y) const
+    {
+        return x >= 0 && x < rows && y >= 0 and y < cols;
+    }
+
+    void processMove()
+    {
+        int cell_x, cell_y;
+        char action;
+        std::cout << "Enter a move (R x y to reveal, F x y to flag/unflag a cell): " << std::endl;
+        std::cin >> action >> cell_x >> cell_y;
+        if (!isValidMove(cell_x, cell_y))
+        {
+            std::cout << "Invalid move! Try again!" << std::endl;
+            return;
+        }
+        if (action == 'R') revealCell(cell_x, cell_y);
+        else if (action == 'F') flagCell(cell_x, cell_y);
+        else std::cout << "Invalid move! Enter R x y to reveal, F x y to flag/unflag a cell: " << std::endl;
     }
 
     friend std::ostream& operator<<(std::ostream& os, const Minefield& minefield)
@@ -95,6 +205,9 @@ public:
         }
         return os;
     }
+    // friend bool Game::isGameOver();
+    friend class Game;
+    friend class Cell;
 };
 
 class Player
@@ -106,6 +219,11 @@ private:
 public:
     explicit Player(const std::string& nickname) : nickname(nickname), highscore(0)
     {
+    }
+
+    const std::string& getNickname() const
+    {
+        return nickname;
     }
 
     friend std::ostream& operator<<(std::ostream& os, const Player& player)
@@ -129,16 +247,59 @@ public:
                                                              gameOver(false)
     {
     }
-
     friend std::ostream& operator<<(std::ostream& os, const Game& game)
     {
-        os << "Player: " << game.player << std::endl;
-        os << "Minefield: \n" << game.minefield << std::endl;
         if (game.gameOver)
         {
-            os << "Game Over" << std::endl;
+            os << "Game over!" << std::endl;
         }
+        os << "Player: " << game.player << std::endl;
+        os << "Minefield: \n" << game.minefield << std::endl;
         return os;
+    }
+
+    bool isGameOver()
+    {
+        for (int i = 0; i < minefield.rows; i++)
+        {
+            for (int j = 0; j < minefield.cols; j++)
+            {
+
+                if (minefield.grid[i][j].isMine() && minefield.grid[i][j].checkIfRevealed())
+                {
+                    std::cout << "You revealed a mine!" << std::endl;
+                    setGameOver();
+                    return true;
+                }
+            }
+        }
+        for (int i = 0; i < minefield.rows; i++)
+        {
+            for (int j = 0; j < minefield.cols; j++)
+            {
+               if (!minefield.grid[i][j].isMine() && !minefield.grid[i][j].checkIfRevealed())
+                   return false;
+            }
+        }
+        std::cout << "You won!" << std::endl;
+        setGameOver();
+        return true;
+    }
+
+    void setGameOver()
+    {
+        gameOver = true;
+    }
+
+    void play()
+    {
+        std::cout << "Welcome to Minesweeper++, " << player.getNickname() << "!" << std::endl;
+        while (!isGameOver())
+        {
+            std::cout << minefield << std::endl;
+            minefield.processMove();
+        }
+        std::cout << *this << std::endl;
     }
 };
 
@@ -150,13 +311,13 @@ SomeClass* getC()
 
 int main()
 {
-    // Minefield minefield(8,8,10);
-    // Player player("Bogdan");
-    // Game game(minefield, player);
-    // std::cout << player << std::endl;
-    // std::cout << minefield << std::endl;
+    Minefield minefield(8,8,9);
+    Player player("Bogdan");
+    minefield.generateMines();
+    minefield.countAdjacentMines();
+    Game game(minefield, player);
+    game.play();
     // std::cout << game << std::endl;
-
     /////////////////////////////////////////////////////////////////////////
     /// Observație: dacă aveți nevoie să citiți date de intrare de la tastatură,
     /// dați exemple de date de intrare folosind fișierul tastatura.txt
