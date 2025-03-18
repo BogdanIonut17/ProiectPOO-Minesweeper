@@ -1,25 +1,20 @@
-# Nu primesc notă pentru că nu am pus titlu și descriere
+# MineMaster
 
-### Folosiți template-ul corespunzător grupei voastre!
+Classic Minesweeper game developed using C++ and the SFML library for GUI.
 
-| Laborant  | Link template                                |
-|-----------|----------------------------------------------|
-| Dragoș B  | https://github.com/Ionnier/oop-template      |
-| Tiberiu M | https://github.com/MaximTiberiu/oop-template |
-| Marius MC | https://github.com/mcmarius/oop-template     |
+MineMaster features an interactive grid-based gameplay where players must uncover safe cells while avoiding hidden mines
+to win the game.
 
-### Important!
+## Rules
 
-Aveți voie cu cod generat de modele de limbaj la care nu ați contribuit semnificativ doar în folder-ul `generated`.
-Codul generat pus "ca să fie"/pe care nu îl înțelegeți se punctează doar pentru puncte bonus, doar în contextul
-în care oferă funcționalități ajutătoare și doar dacă are sens.
-
-O cerință nu se consideră îndeplinită dacă este realizată doar prin cod generat.
-
-- **Fără cod de umplutură/fără sens!**
-- **Fără copy-paste!**
-- **Fără variabile globale!**
-- **Fără atribute publice!**
+- The board is divided into cells, with mines randomly distributed.
+- Cells can be unrevealed, revealed or flagged.
+  - An unrevealed cell is blank, and left-clicking on it will expose it.
+  - If you reveal a mine, you lose the game! Else, you will see the number of mines adjacent to it or a blank cell,
+    revealing all adjacent non-mined cells.
+  - You can also mark cells you suspect of having a mine by right-clicking them, but you can still reveal them, so be
+    careful!
+- You win when you reveal all the cells that aren't mines!
 
 ### Tema 0
 
