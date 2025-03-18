@@ -54,7 +54,8 @@ public:
 
     friend std::ostream& operator<<(std::ostream& os, const Cell& cell)
     {
-        if (cell.isRevealed) {
+        if (cell.isRevealed)
+        {
             if (cell.hasMine) os << "*";
             else if (cell.adjacentMines)
             {
@@ -63,17 +64,20 @@ public:
             else
                 os << ".";
         }
-        else if (cell.isFlagged) {
+        else if (cell.isFlagged)
+        {
             os << "F";
         }
-        else {
+        else
+        {
             os << "#";
         }
         return os;
     }
 
-    bool isMine() const {
-       return hasMine;
+    bool isMine() const
+    {
+        return hasMine;
     }
 
     bool checkIfRevealed() const
@@ -91,7 +95,8 @@ public:
         isFlagged = !isFlagged;
     }
 
-    void setAdjacentMines(int adjacent_mines) {
+    void setAdjacentMines(int adjacent_mines)
+    {
         adjacentMines = adjacent_mines;
     }
 };
@@ -106,21 +111,26 @@ private:
 
 public:
     Minefield(const int rows, const int cols, const int mineCount) : rows(rows), cols(cols), mineCount(mineCount),
-                                                                     grid(rows, std::vector<Cell>(cols)) {}
+                                                                     grid(rows, std::vector<Cell>(cols))
+    {
+    }
 
-    void generateMines() {
+    void generateMines()
+    {
         // srand(time(0));
         std::random_device rd;
         std::mt19937 gen(rd());
-        std::uniform_int_distribution<int> distRow(0,rows-1);
+        std::uniform_int_distribution<int> distRow(0, rows - 1);
         std::uniform_int_distribution<int> distCol(0, cols - 1);
-        int minesPlaced=0;
-        while (minesPlaced < mineCount) {
+        int minesPlaced = 0;
+        while (minesPlaced < mineCount)
+        {
             int mine_x = distRow(gen);
             int mine_y = distCol(gen);
-            if (!grid[mine_x][mine_y].isMine()){
-                grid[mine_x][mine_y]= Cell(true);
-                minesPlaced ++;
+            if (!grid[mine_x][mine_y].isMine())
+            {
+                grid[mine_x][mine_y] = Cell(true);
+                minesPlaced++;
             }
         }
     }
@@ -132,12 +142,12 @@ public:
             for (int j = 0; j < cols; j++)
             {
                 if (grid[i][j].isMine()) continue;
-                int count=0;
-                for (int dx=-1; dx<=1; dx++)
+                int count = 0;
+                for (int dx = -1; dx <= 1; dx++)
                 {
-                    for (int dy=-1; dy<=1; dy++)
+                    for (int dy = -1; dy <= 1; dy++)
                     {
-                        int x = i+dx, y = j+dy;
+                        int x = i + dx, y = j + dy;
                         if (isValidMove(x, y) && grid[x][y].isMine())
                             count++;
                     }
@@ -153,22 +163,21 @@ public:
         {
             grid[cell_x][cell_y].reveal();
             if (!grid[cell_x][cell_y].isMine())
-                for (int dx=-1; dx<=1; dx++)
+                for (int dx = -1; dx <= 1; dx++)
                 {
-                for (int dy=-1; dy<=1; dy++)
-                {
-                    int x = cell_x+dx, y = cell_y+dy;
-                    if (isValidMove(x, y) && !grid[x][y].isMine())
-                        grid[x][y].reveal();
-                }
+                    for (int dy = -1; dy <= 1; dy++)
+                    {
+                        int x = cell_x + dx, y = cell_y + dy;
+                        if (isValidMove(x, y) && !grid[x][y].isMine())
+                            grid[x][y].reveal();
+                    }
                 }
         }
-
     }
 
     void flagCell(const int x, const int y)
     {
-            grid[x][y].toggleFlag();
+        grid[x][y].toggleFlag();
     }
 
     bool isValidMove(const int x, const int y) const
@@ -247,6 +256,7 @@ public:
                                                              gameOver(false)
     {
     }
+
     friend std::ostream& operator<<(std::ostream& os, const Game& game)
     {
         if (game.gameOver)
@@ -264,7 +274,6 @@ public:
         {
             for (int j = 0; j < minefield.cols; j++)
             {
-
                 if (minefield.grid[i][j].isMine() && minefield.grid[i][j].checkIfRevealed())
                 {
                     std::cout << "You revealed a mine!" << std::endl;
@@ -277,8 +286,8 @@ public:
         {
             for (int j = 0; j < minefield.cols; j++)
             {
-               if (!minefield.grid[i][j].isMine() && !minefield.grid[i][j].checkIfRevealed())
-                   return false;
+                if (!minefield.grid[i][j].isMine() && !minefield.grid[i][j].checkIfRevealed())
+                    return false;
             }
         }
         std::cout << "You won!" << std::endl;
@@ -311,7 +320,7 @@ SomeClass* getC()
 
 int main()
 {
-    Minefield minefield(8,8,9);
+    Minefield minefield(8, 8, 9);
     Player player("Bogdan");
     minefield.generateMines();
     minefield.countAdjacentMines();
