@@ -2,7 +2,7 @@
 // #include <array>
 #include <chrono>
 #include <thread>
-#include <ctime>
+// #include <ctime>
 #include <SFML/Graphics.hpp>
 
 #include <Helper.h>
@@ -101,8 +101,6 @@ public:
     }
 };
 
-class Game;
-
 class Minefield
 {
 private:
@@ -114,6 +112,11 @@ public:
                                                                      grid(rows, std::vector<Cell>(cols))
     {
     }
+
+    int getRows() const { return rows; }
+    int getCols() const { return cols; }
+    Cell& getCell(int x, int y) { return grid[x][y]; }
+    const Cell& getCell(int x, int y) const { return grid[x][y]; }
 
     void generateMines()
     {
@@ -214,9 +217,6 @@ public:
         }
         return os;
     }
-    // friend bool Game::isGameOver();
-    friend class Game;
-    friend class Cell;
 };
 
 class Player
@@ -268,36 +268,31 @@ public:
         return os;
     }
 
+    void setGameOver()
+    {
+        gameOver = true;
+    }
+
     bool isGameOver()
     {
-        for (int i = 0; i < minefield.rows; i++)
-        {
-            for (int j = 0; j < minefield.cols; j++)
-            {
-                if (minefield.grid[i][j].isMine() && minefield.grid[i][j].checkIfRevealed())
-                {
+        for (int i = 0; i < minefield.getRows(); i++) {
+            for (int j = 0; j < minefield.getCols(); j++) {
+                if (minefield.getCell(i, j).isMine() && minefield.getCell(i, j).checkIfRevealed()) {
                     std::cout << "You revealed a mine!" << std::endl;
                     setGameOver();
                     return true;
                 }
             }
         }
-        for (int i = 0; i < minefield.rows; i++)
-        {
-            for (int j = 0; j < minefield.cols; j++)
-            {
-                if (!minefield.grid[i][j].isMine() && !minefield.grid[i][j].checkIfRevealed())
+        for (int i = 0; i < minefield.getRows(); i++) {
+            for (int j = 0; j < minefield.getCols(); j++) {
+                if (!minefield.getCell(i, j).isMine() && !minefield.getCell(i, j).checkIfRevealed())
                     return false;
             }
         }
         std::cout << "You won!" << std::endl;
         setGameOver();
         return true;
-    }
-
-    void setGameOver()
-    {
-        gameOver = true;
     }
 
     void play()
