@@ -4,7 +4,7 @@
 #include <thread>
 // #include <ctime>
 #include <SFML/Graphics.hpp>
-
+#include <queue>
 #include <Helper.h>
 #include <ostream>
 #include <random>
@@ -99,6 +99,11 @@ public:
     {
         adjacentMines = adjacent_mines;
     }
+
+    int getAdjacentMines() const
+    {
+        return adjacentMines;
+    }
 };
 
 class Minefield
@@ -162,19 +167,43 @@ public:
 
     void revealCell(const int cell_x, const int cell_y)
     {
-        if (!grid[cell_x][cell_y].checkIfRevealed())
-        {
-            grid[cell_x][cell_y].reveal();
-            if (!grid[cell_x][cell_y].isMine())
-                for (int dx = -1; dx <= 1; dx++)
-                {
-                    for (int dy = -1; dy <= 1; dy++)
-                    {
-                        int x = cell_x + dx, y = cell_y + dy;
-                        if (isValidMove(x, y) && !grid[x][y].isMine())
-                            grid[x][y].reveal();
+        if (grid[cell_x][cell_y].checkIfRevealed())
+            return;
+        if (grid[cell_x][cell_y].getAdjacentMines() == 0) {
+                BFSReveal(cell_x, cell_y);
+            }
+        else {
+                grid[cell_x][cell_y].reveal();
+            }
+    }
+
+    void BFSReveal(int startX, int startY) {
+        if (!isValidMove(startX, startY) || grid[startX][startY].isMine()) {
+            return;
+        }
+
+        std::queue<std::pair<int, int>> q;
+        q.emplace(startX, startY);
+        std::vector visited(rows, std::vector(cols, false));
+
+        while (!q.empty()) {
+            auto [x, y] = q.front();
+            q.pop();
+
+            if (visited[x][y]) continue;
+            visited[x][y] = true;
+            grid[x][y].reveal();
+
+            if (grid[x][y].getAdjacentMines() > 0) continue;
+
+            for (int dx = -1; dx <= 1; dx++) {
+                for (int dy = -1; dy <= 1; dy++) {
+                    int adjacentX = x + dx, adjacentY = y + dy;
+                    if (isValidMove(adjacentX, adjacentY) && !grid[adjacentX][adjacentY].checkIfRevealed() && !visited[adjacentX][adjacentY]) {
+                        q.emplace(adjacentX, adjacentY);
                     }
                 }
+            }
         }
     }
 
@@ -275,17 +304,22 @@ public:
 
     bool isGameOver()
     {
-        for (int i = 0; i < minefield.getRows(); i++) {
-            for (int j = 0; j < minefield.getCols(); j++) {
-                if (minefield.getCell(i, j).isMine() && minefield.getCell(i, j).checkIfRevealed()) {
+        for (int i = 0; i < minefield.getRows(); i++)
+        {
+            for (int j = 0; j < minefield.getCols(); j++)
+            {
+                if (minefield.getCell(i, j).isMine() && minefield.getCell(i, j).checkIfRevealed())
+                {
                     std::cout << "You revealed a mine!" << std::endl;
                     setGameOver();
                     return true;
                 }
             }
         }
-        for (int i = 0; i < minefield.getRows(); i++) {
-            for (int j = 0; j < minefield.getCols(); j++) {
+        for (int i = 0; i < minefield.getRows(); i++)
+        {
+            for (int j = 0; j < minefield.getCols(); j++)
+            {
                 if (!minefield.getCell(i, j).isMine() && !minefield.getCell(i, j).checkIfRevealed())
                     return false;
             }
@@ -297,7 +331,7 @@ public:
 
     void play()
     {
-        std::cout << "Welcome to Minesweeper++, " << player.getNickname() << "!" << std::endl;
+        std::cout << "Welcome to MineMaster, " << player.getNickname() << "!" << std::endl;
         while (!isGameOver())
         {
             std::cout << minefield << std::endl;
