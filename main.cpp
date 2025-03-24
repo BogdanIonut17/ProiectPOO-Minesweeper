@@ -115,8 +115,9 @@ private:
 public:
     // Minefield() = default;
 
-    Minefield(const int rows=8, const int cols=8, const int mineCount=9) : rows(rows), cols(cols), mineCount(mineCount),
-                                                                     grid(rows, std::vector<Cell>(cols))
+    Minefield(const int rows = 8, const int cols = 8, const int mineCount = 9) : rows(rows), cols(cols),
+        mineCount(mineCount),
+        grid(rows, std::vector<Cell>(cols))
     {
     }
 
@@ -217,8 +218,10 @@ public:
         }
     }
 
-    void setFieldSize(const int newRows, const int newCols, const int newMineCount) {
-        if (newRows <= 0 || newCols <= 0 || newMineCount < 0 || newMineCount > newRows * newCols) {
+    void setFieldSize(const int newRows, const int newCols, const int newMineCount)
+    {
+        if (newRows <= 0 || newCols <= 0 || newMineCount < 0 || newMineCount > newRows * newCols)
+        {
             std::cout << "Invalid board size or mine count!" << std::endl;
             return;
         }
@@ -360,7 +363,7 @@ public:
         setTimeout([]() {
     std::cout << "Time's up! You lost!" << std::endl;
     exit(0);
-}, std::chrono::minutes(10));
+        }, std::chrono::minutes(10));
 
         while (!isGameOver())
         {
@@ -370,8 +373,10 @@ public:
         std::cout << *this << std::endl;
     }
 
-    void setTimeout(std::function<void()> func, std::chrono::milliseconds delay) {
-        std::thread([func, delay]() {
+    void setTimeout(std::function<void()> func, std::chrono::milliseconds delay)
+    {
+        std::thread([func, delay]()
+        {
             std::this_thread::sleep_for(delay);
             func();
         }).detach();
