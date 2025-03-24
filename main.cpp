@@ -361,8 +361,8 @@ public:
     {
         std::cout << "Welcome to MineMaster, " << player.getNickname() << "!" << std::endl;
         setTimeout([]() {
-        std::cout << "Time's up! You lost!" << std::endl;
-        exit(0);
+            std::cout << "Time's up! You lost!" << std::endl;
+            exit(0);
         }, std::chrono::minutes(10));
 
         while (!isGameOver())
