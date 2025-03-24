@@ -113,9 +113,9 @@ private:
     std::vector<std::vector<Cell>> grid;
 
 public:
-    explicit Minefield(const int rows = 8, const int cols = 8, const int mineCount = 9) : rows(rows), cols(cols),
-                                                                                          mineCount(mineCount),
-                                                                                          grid(rows, std::vector<Cell>(cols))
+    explicit Minefield(const int rows, const int cols, const int mineCount) : rows(rows), cols(cols),
+                                                                              mineCount(mineCount),
+                                                                              grid(rows, std::vector<Cell>(cols))
     {
     }
 
@@ -169,7 +169,7 @@ public:
     {
         if (grid[cell_x][cell_y].checkIfRevealed())
             return;
-        if (grid[cell_x][cell_y].getAdjacentMines() == 0)
+        if (grid[cell_x][cell_y].getAdjacentMines() == 0 && !grid[cell_x][cell_y].isMine())
         {
             BFSReveal(cell_x, cell_y);
         }
@@ -181,7 +181,8 @@ public:
 
     void BFSReveal(int startX, int startY)
     {
-        if (!isValidMove(startX, startY) || grid[startX][startY].isMine())
+        if (!isValidMove(startX, startY))
+        // if (!isValidMove(startX, startY))
         {
             return;
         }
@@ -287,6 +288,10 @@ public:
     {
         return nickname;
     }
+    int getHighscore() const
+    {
+        return highscore;
+    }
 
     friend std::ostream& operator<<(std::ostream& os, const Player& player)
     {
@@ -316,8 +321,10 @@ public:
         {
             os << "Game over!" << std::endl;
         }
-        os << "Player: " << game.player << std::endl;
-        os << "Minefield: \n" << game.minefield << std::endl;
+        os << "Player: " << game.player.getNickname() << std::endl;
+        os << "Score: " << game.player.getHighscore() << std::endl;
+        os << "Minefield: " << std::endl;
+        os << game.minefield << std::endl;
         return os;
     }
 
@@ -356,10 +363,13 @@ public:
     void play()
     {
         std::cout << "Welcome to MineMaster, " << player.getNickname() << "!" << std::endl;
-        setTimeout([]() {
-            std::cout << "Time's up! You lost!" << std::endl;
+        setTimeout([this]() {
+            if (!gameOver)
+            {
+                std::cout << "Time's up! You lost!" << std::endl;
+            }
             exit(0);
-        }, std::chrono::minutes(10));
+        }, std::chrono::minutes(5));
 
         while (!isGameOver())
         {
@@ -369,9 +379,9 @@ public:
         std::cout << *this << std::endl;
     }
 
-    void setTimeout(std::function<void()> func, std::chrono::milliseconds delay)
+    void setTimeout(const std::function<void()>& func, std::chrono::milliseconds delay)
     {
-        std::thread([func, delay]()
+        std::thread([func, delay]
         {
             std::this_thread::sleep_for(delay);
             func();
@@ -387,7 +397,7 @@ SomeClass* getC()
 
 int main()
 {
-    Minefield minefield;
+    Minefield minefield(8, 8, 9);
 
     // int newRows, newCols, newMineCount;
     // std::cout << "Enter board size (rows, cols) and number of mines: ";
