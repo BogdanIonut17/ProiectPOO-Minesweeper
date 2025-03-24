@@ -113,8 +113,6 @@ private:
     std::vector<std::vector<Cell>> grid;
 
 public:
-    // Minefield() = default;
-
     Minefield(const int rows = 8, const int cols = 8, const int mineCount = 9) : rows(rows), cols(cols),
         mineCount(mineCount),
         grid(rows, std::vector<Cell>(cols))
@@ -229,9 +227,7 @@ public:
         cols = newCols;
         mineCount = newMineCount;
 
-        // grid = std::vector(rows, std::vector<Cell>(cols));
-        grid.clear();
-        grid.resize(rows, std::vector(cols, Cell(false)));
+        grid = std::vector(rows, std::vector<Cell>(cols));
     }
 
 
