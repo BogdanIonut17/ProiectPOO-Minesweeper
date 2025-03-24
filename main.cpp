@@ -2,12 +2,12 @@
 // #include <array>
 #include <chrono>
 #include <thread>
-// #include <ctime>
 #include <SFML/Graphics.hpp>
 #include <queue>
 #include <Helper.h>
 #include <ostream>
 #include <random>
+#include <functional>
 
 //////////////////////////////////////////////////////////////////////
 /// This class is used to test that the memory leak checks work as expected even when using a GUI
@@ -113,7 +113,9 @@ private:
     std::vector<std::vector<Cell>> grid;
 
 public:
-    Minefield(const int rows, const int cols, const int mineCount) : rows(rows), cols(cols), mineCount(mineCount),
+    // Minefield() = default;
+
+    Minefield(const int rows=8, const int cols=8, const int mineCount=9) : rows(rows), cols(cols), mineCount(mineCount),
                                                                      grid(rows, std::vector<Cell>(cols))
     {
     }
@@ -125,7 +127,6 @@ public:
 
     void generateMines()
     {
-        // srand(time(0));
         std::random_device rd;
         std::mt19937 gen(rd());
         std::uniform_int_distribution<int> distRow(0, rows - 1);
@@ -169,16 +170,20 @@ public:
     {
         if (grid[cell_x][cell_y].checkIfRevealed())
             return;
-        if (grid[cell_x][cell_y].getAdjacentMines() == 0) {
-                BFSReveal(cell_x, cell_y);
-            }
-        else {
-                grid[cell_x][cell_y].reveal();
-            }
+        if (grid[cell_x][cell_y].getAdjacentMines() == 0)
+        {
+            BFSReveal(cell_x, cell_y);
+        }
+        else
+        {
+            grid[cell_x][cell_y].reveal();
+        }
     }
 
-    void BFSReveal(int startX, int startY) {
-        if (!isValidMove(startX, startY) || grid[startX][startY].isMine()) {
+    void BFSReveal(int startX, int startY)
+    {
+        if (!isValidMove(startX, startY) || grid[startX][startY].isMine())
+        {
             return;
         }
 
@@ -186,7 +191,8 @@ public:
         q.emplace(startX, startY);
         std::vector visited(rows, std::vector(cols, false));
 
-        while (!q.empty()) {
+        while (!q.empty())
+        {
             auto [x, y] = q.front();
             q.pop();
 
@@ -196,16 +202,35 @@ public:
 
             if (grid[x][y].getAdjacentMines() > 0) continue;
 
-            for (int dx = -1; dx <= 1; dx++) {
-                for (int dy = -1; dy <= 1; dy++) {
+            for (int dx = -1; dx <= 1; dx++)
+            {
+                for (int dy = -1; dy <= 1; dy++)
+                {
                     int adjacentX = x + dx, adjacentY = y + dy;
-                    if (isValidMove(adjacentX, adjacentY) && !grid[adjacentX][adjacentY].checkIfRevealed() && !visited[adjacentX][adjacentY]) {
+                    if (isValidMove(adjacentX, adjacentY) && !grid[adjacentX][adjacentY].checkIfRevealed() && !visited[
+                        adjacentX][adjacentY])
+                    {
                         q.emplace(adjacentX, adjacentY);
                     }
                 }
             }
         }
     }
+
+    void setFieldSize(const int newRows, const int newCols, const int newMineCount) {
+        if (newRows <= 0 || newCols <= 0 || newMineCount < 0 || newMineCount > newRows * newCols) {
+            std::cout << "Invalid board size or mine count!" << std::endl;
+            return;
+        }
+        rows = newRows;
+        cols = newCols;
+        mineCount = newMineCount;
+
+        // grid = std::vector(rows, std::vector<Cell>(cols));
+        grid.clear();
+        grid.resize(rows, std::vector(cols, Cell(false)));
+    }
+
 
     void flagCell(const int x, const int y)
     {
@@ -332,12 +357,24 @@ public:
     void play()
     {
         std::cout << "Welcome to MineMaster, " << player.getNickname() << "!" << std::endl;
+        setTimeout([]() {
+    std::cout << "Time's up! You lost!" << std::endl;
+    exit(0);
+}, std::chrono::minutes(10));
+
         while (!isGameOver())
         {
             std::cout << minefield << std::endl;
             minefield.processMove();
         }
         std::cout << *this << std::endl;
+    }
+
+    void setTimeout(std::function<void()> func, std::chrono::milliseconds delay) {
+        std::thread([func, delay]() {
+            std::this_thread::sleep_for(delay);
+            func();
+        }).detach();
     }
 };
 
@@ -349,13 +386,20 @@ SomeClass* getC()
 
 int main()
 {
-    Minefield minefield(8, 8, 9);
-    Player player("Bogdan");
+    Minefield minefield;
+
+    // int newRows, newCols, newMineCount;
+    // std::cout << "Enter board size (rows, cols) and number of mines: ";
+    // std::cin >> newRows >> newCols >> newMineCount;
+    // minefield.setFieldSize(newRows, newCols, newMineCount);
+
     minefield.generateMines();
     minefield.countAdjacentMines();
+
+    Player player("Bogdan");
     Game game(minefield, player);
     game.play();
-    // std::cout << game << std::endl;
+
     /////////////////////////////////////////////////////////////////////////
     /// Observație: dacă aveți nevoie să citiți date de intrare de la tastatură,
     /// dați exemple de date de intrare folosind fișierul tastatura.txt
