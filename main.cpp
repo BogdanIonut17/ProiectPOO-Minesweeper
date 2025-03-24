@@ -113,15 +113,18 @@ private:
     std::vector<std::vector<Cell>> grid;
 
 public:
-    explicit Minefield(const int rows, const int cols, const int mineCount) : rows(rows), cols(cols),
-                                                                              mineCount(mineCount),
-                                                                              grid(rows, std::vector<Cell>(cols))
+    Minefield(const int rows, const int cols, const int mineCount) : rows(rows), cols(cols),
+                                                                     mineCount(mineCount),
+                                                                     grid(rows, std::vector<Cell>(cols))
     {
     }
 
     int getRows() const { return rows; }
+
     int getCols() const { return cols; }
+
     Cell& getCell(int x, int y) { return grid[x][y]; }
+
     const Cell& getCell(int x, int y) const { return grid[x][y]; }
 
     void generateMines()
@@ -182,7 +185,6 @@ public:
     void BFSReveal(int startX, int startY)
     {
         if (!isValidMove(startX, startY))
-        // if (!isValidMove(startX, startY))
         {
             return;
         }
@@ -217,19 +219,18 @@ public:
         }
     }
 
-    // void setFieldSize(const int newRows, const int newCols, const int newMineCount)
-    // {
-    //     if (newRows <= 0 || newCols <= 0 || newMineCount < 0 || newMineCount > newRows * newCols)
-    //     {
-    //         std::cout << "Invalid board size or mine count!" << std::endl;
-    //         return;
-    //     }
-    //     rows = newRows;
-    //     cols = newCols;
-    //     mineCount = newMineCount;
-    //
-    //     grid = std::vector(rows, std::vector<Cell>(cols));
-    // }
+    void setFieldSize(const int newRows, const int newCols, const int newMineCount)
+    {
+        if (newRows <= 0 || newCols <= 0 || newMineCount < 0 || newMineCount > newRows * newCols)
+        {
+            std::cout << "Invalid board size or mine count!" << std::endl;
+            return;
+        }
+        rows = newRows;
+        cols = newCols;
+        mineCount = newMineCount;
+        grid = std::vector(rows, std::vector<Cell>(cols));
+    }
 
 
     void flagCell(const int x, const int y)
@@ -399,10 +400,10 @@ int main()
 {
     Minefield minefield(8, 8, 9);
 
-    // int newRows, newCols, newMineCount;
-    // std::cout << "Enter board size (rows, cols) and number of mines: ";
-    // std::cin >> newRows >> newCols >> newMineCount;
-    // minefield.setFieldSize(newRows, newCols, newMineCount);
+    int newRows = 0, newCols = 0, newMineCount = 0;
+    std::cout << "Enter board size (rows, cols) and number of mines: ";
+    std::cin >> newRows >> newCols >> newMineCount;
+    minefield.setFieldSize(newRows, newCols, newMineCount);
 
     minefield.generateMines();
     minefield.countAdjacentMines();
@@ -411,7 +412,7 @@ int main()
     Game game(minefield, player);
     game.play();
 
-    /////////////////////////////////////////////////////////////////////////
+
     /// Observație: dacă aveți nevoie să citiți date de intrare de la tastatură,
     /// dați exemple de date de intrare folosind fișierul tastatura.txt
     /// Trebuie să aveți în fișierul tastatura.txt suficiente date de intrare
@@ -429,9 +430,8 @@ int main()
     /// testez codul cu ce date de intrare am chef și să nu pun notă dacă găsesc vreun bug.
     /// Impun această cerință ca să învățați să faceți un demo și să arătați părțile din
     /// program care merg (și să le evitați pe cele care nu merg).
-    ///
 
-    ///////////////////////////////////////////////////////////////////////////
+
     /// Pentru date citite din fișier, NU folosiți tastatura.txt. Creați-vă voi
     /// alt fișier propriu cu ce alt nume doriți.
     /// Exemplu:
@@ -444,7 +444,6 @@ int main()
     ///////////////////////////////////////////////////////////////////////////
     Helper helper;
     helper.help();
-    ///////////////////////////////////////////////////////////////////////////
 
     SomeClass* c = getC();
     std::cout << c << "\n";
@@ -453,7 +452,7 @@ int main()
     sf::RenderWindow window;
     ///////////////////////////////////////////////////////////////////////////
     /// NOTE: sync with env variable APP_WINDOW from .github/workflows/cmake.yml:31
-    window.create(sf::VideoMode({800, 700}), "Minesweeper++", sf::Style::Default);
+    window.create(sf::VideoMode({800, 700}), "MineMaster", sf::Style::Default);
 
     ///////////////////////////////////////////////////////////////////////////
     /// NOTE: mandatory use one of vsync or FPS limit (not both)            ///
@@ -461,7 +460,6 @@ int main()
     window.setVerticalSyncEnabled(true);
     ///
        /// window.setFramerateLimit(60);                                       ///
-       ///////////////////////////////////////////////////////////////////////////
 
     while (window.isOpen())
     {
