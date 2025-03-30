@@ -1,5 +1,4 @@
 #include <iostream>
-// #include <array>
 #include <chrono>
 #include <thread>
 #include <SFML/Graphics.hpp>
@@ -75,14 +74,19 @@ public:
         return os;
     }
 
-    bool isMine() const
+    [[nodiscard]] bool isMine() const
     {
         return hasMine;
     }
 
-    bool checkIfRevealed() const
+    [[nodiscard]] bool checkIfRevealed() const
     {
         return isRevealed;
+    }
+
+    [[nodiscard]] bool checkIfFlagged() const
+    {
+        return isFlagged;
     }
 
     void reveal()
@@ -100,7 +104,7 @@ public:
         adjacentMines = adjacent_mines;
     }
 
-    int getAdjacentMines() const
+    [[nodiscard]] int getAdjacentMines() const
     {
         return adjacentMines;
     }
@@ -111,38 +115,38 @@ class Minefield
 private:
     int rows, cols, mineCount;
     std::vector<std::vector<Cell>> grid;
+    bool firstMove;
 
 public:
     Minefield(const int rows, const int cols, const int mineCount) : rows(rows), cols(cols),
                                                                      mineCount(mineCount),
-                                                                     grid(rows, std::vector<Cell>(cols))
+                                                                     grid(rows, std::vector<Cell>(cols)), firstMove(true)
     {
     }
 
-    int getRows() const { return rows; }
+    [[nodiscard]] int getRows() const { return rows; }
 
-    int getCols() const { return cols; }
+    [[nodiscard]] int getCols() const { return cols; }
 
     Cell& getCell(int x, int y) { return grid[x][y]; }
 
-    const Cell& getCell(int x, int y) const { return grid[x][y]; }
+    [[nodiscard]] const Cell& getCell(int x, int y) const { return grid[x][y]; }
 
-    void generateMines()
+    void generateMines(int firstX, int firstY)
     {
         std::random_device rd;
         std::mt19937 gen(rd());
-        std::uniform_int_distribution<int> distRow(0, rows - 1);
-        std::uniform_int_distribution<int> distCol(0, cols - 1);
+        std::uniform_int_distribution distRow(0, rows - 1);
+        std::uniform_int_distribution distCol(0, cols - 1);
         int minesPlaced = 0;
         while (minesPlaced < mineCount)
         {
-            int mine_x = distRow(gen);
-            int mine_y = distCol(gen);
-            if (!grid[mine_x][mine_y].isMine())
-            {
-                grid[mine_x][mine_y] = Cell(true);
-                minesPlaced++;
-            }
+            int mineX = distRow(gen);
+            int mineY = distCol(gen);
+            if ((mineX == firstX && mineY == firstY) || grid[mineX][mineY].isMine())
+                continue;
+            grid[mineX][mineY] = Cell(true);
+            minesPlaced++;
         }
     }
 
@@ -168,17 +172,28 @@ public:
         }
     }
 
-    void revealCell(const int cell_x, const int cell_y)
+    void revealCell(const int cellX, const int cellY)
     {
-        if (grid[cell_x][cell_y].checkIfRevealed())
+        if (grid[cellX][cellY].checkIfFlagged())
             return;
-        if (grid[cell_x][cell_y].getAdjacentMines() == 0 && !grid[cell_x][cell_y].isMine())
+        if (grid[cellX][cellY].checkIfRevealed() && grid[cellX][cellY].getAdjacentMines() > 0)
         {
-            BFSReveal(cell_x, cell_y);
+            chordReveal(cellX, cellY);
+            return;
+        }
+        if (firstMove)
+        {
+            generateMines(cellX, cellY);
+            countAdjacentMines();
+            firstMove = false;
+        }
+        if (grid[cellX][cellY].getAdjacentMines() == 0 && !grid[cellX][cellY].isMine())
+        {
+            BFSReveal(cellX, cellY);
         }
         else
         {
-            grid[cell_x][cell_y].reveal();
+            grid[cellX][cellY].reveal();
         }
     }
 
@@ -219,6 +234,83 @@ public:
         }
     }
 
+    void chordReveal(int x, int y)
+    {
+        if (!grid[x][y].checkIfRevealed() || grid[x][y].getAdjacentMines() == 0)
+            return;
+
+        int flagCount = 0;
+        std::vector<std::pair<int, int>> toReveal;
+
+        for (int dx = -1; dx <= 1; dx++)
+        {
+            for (int dy = -1; dy <= 1; dy++)
+            {
+                int adjacentX = x + dx, adjacentY = y + dy;
+                if (isValidMove(adjacentX, adjacentY))
+                {
+                    if (grid[adjacentX][adjacentY].checkIfFlagged())
+                    {
+                        flagCount++;
+                    }
+                    else if (!grid[adjacentX][adjacentY].checkIfRevealed())
+                    {
+                        toReveal.emplace_back(adjacentX, adjacentY);
+                    }
+                }
+            }
+        }
+
+        if (flagCount == grid[x][y].getAdjacentMines())
+        {
+            for (const auto& [adjX, adjY] : toReveal)
+            {
+                revealCell(adjX, adjY);
+            }
+        }
+    }
+
+    void shuffleMines() {
+        std::vector<std::pair<int, int>> emptyCells;
+        std::vector<std::pair<int, int>> mines;
+
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                if (!grid[i][j].checkIfRevealed()) {
+                    if (grid[i][j].checkIfFlagged())
+                    {
+                        grid[i][j].toggleFlag();
+                    }
+                    if (grid[i][j].isMine()) {
+                        mines.emplace_back(i, j);
+                    } else {
+                        emptyCells.emplace_back(i, j);
+                    }
+                }
+            }
+        }
+
+        if (emptyCells.size() < mines.size()) {
+            return;
+        }
+
+        for (auto& [x, y] : mines) {
+            grid[x][y] = Cell(false);
+        }
+
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::ranges::shuffle(emptyCells, gen);
+
+        for (int i = 0; i < mineCount; i++) {
+            auto [x, y] = emptyCells[i];
+            grid[x][y] = Cell(true);
+        }
+
+        countAdjacentMines();
+    }
+
+
     void setFieldSize(const int newRows, const int newCols, const int newMineCount)
     {
         if (newRows <= 0 || newCols <= 0 || newMineCount < 0 || newMineCount > newRows * newCols)
@@ -235,33 +327,54 @@ public:
 
     void flagCell(const int x, const int y)
     {
-        grid[x][y].toggleFlag();
+        if (!grid[x][y].checkIfRevealed())
+        {
+            grid[x][y].toggleFlag();
+            if (grid[x][y].checkIfFlagged())
+            {
+                mineCount--;
+            }
+            else
+            {
+                mineCount++;
+            }
+        }
     }
 
-    bool isValidMove(const int x, const int y) const
+    [[nodiscard]] bool isValidMove(const int x, const int y) const
     {
         return x >= 0 && x < rows && y >= 0 and y < cols;
     }
 
     void processMove()
     {
-        int cell_x, cell_y;
+        int cellX, cellY;
         char action;
-        std::cout << "Enter a move (R x y to reveal, F x y to flag/unflag a cell): " << std::endl;
-        std::cin >> action >> cell_x >> cell_y;
-        if (!isValidMove(cell_x, cell_y))
+        std::cout << "Enter a move (R x y to reveal, F x y to flag/unflag a cell or S to shuffle the mines): " << std::endl;
+        std::cin >> action;
+        if (std::toupper(action) != 'R' && std::toupper(action) != 'F' && std::toupper(action) != 'S')
+        {
+            std::cout << "Invalid move! Enter R x y to reveal, F x y to flag/unflag a cell or S to shuffle the mines: " << std::endl;
+            return;
+        }
+        if (std::toupper(action) == 'S')
+        {
+            shuffleMines();
+            return;
+        }
+        std::cin >> cellX >> cellY;
+        if (!isValidMove(cellX, cellY))
         {
             std::cout << "Invalid move! Try again!" << std::endl;
             return;
         }
-        if (action == 'R') revealCell(cell_x, cell_y);
-        else if (action == 'F') flagCell(cell_x, cell_y);
-        else std::cout << "Invalid move! Enter R x y to reveal, F x y to flag/unflag a cell: " << std::endl;
+        if (std::toupper(action) == 'R') revealCell(cellX, cellY);
+        else if (std::toupper(action) == 'F') flagCell(cellX, cellY);
     }
 
     friend std::ostream& operator<<(std::ostream& os, const Minefield& minefield)
     {
-        std::cout << "Total number of mines: " << minefield.mineCount << std::endl;
+
         for (int i = 0; i < minefield.rows; i++)
         {
             for (int j = 0; j < minefield.cols; j++)
@@ -270,6 +383,7 @@ public:
             }
             os << std::endl;
         }
+        std::cout << "Number of mines: " << minefield.mineCount << std::endl;
         return os;
     }
 };
@@ -285,11 +399,11 @@ public:
     {
     }
 
-    const std::string& getNickname() const
+    [[nodiscard]] const std::string& getNickname() const
     {
         return nickname;
     }
-    int getHighscore() const
+    [[nodiscard]] int getHighscore() const
     {
         return highscore;
     }
@@ -404,9 +518,6 @@ int main()
     std::cout << "Enter board size (rows, cols) and number of mines: ";
     std::cin >> newRows >> newCols >> newMineCount;
     minefield.setFieldSize(newRows, newCols, newMineCount);
-
-    minefield.generateMines();
-    minefield.countAdjacentMines();
 
     Player player("Bogdan");
     Game game(minefield, player);
