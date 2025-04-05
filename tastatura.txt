@@ -1,12 +1,22 @@
-4 4 6
+4 4 15
+Bogdan
 r 0 0
+y
+4 4 15
+Bogdan
 F 0 1
 F 2 2
+r 3 3
+y
+4 4 6
+Bogdan
 r 0 0
+f 0 1
 R 1 1
 R 3 3
 s
-R 1 0
-R 0 1
+R 0 0
+R 2 1
 R 2 2
 R 3 2
+r 2 3

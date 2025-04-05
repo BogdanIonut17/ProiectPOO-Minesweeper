@@ -120,7 +120,8 @@ private:
 public:
     Minefield(const int rows, const int cols, const int mineCount) : rows(rows), cols(cols),
                                                                      mineCount(mineCount),
-                                                                     grid(rows, std::vector<Cell>(cols)), firstMove(true)
+                                                                     grid(rows, std::vector<Cell>(cols)),
+                                                                     firstMove(true)
     {
     }
 
@@ -131,6 +132,11 @@ public:
     Cell& getCell(int x, int y) { return grid[x][y]; }
 
     [[nodiscard]] const Cell& getCell(int x, int y) const { return grid[x][y]; }
+
+    void setFirstMove()
+    {
+        firstMove = true;
+    }
 
     void generateMines(int firstX, int firstY)
     {
@@ -270,31 +276,40 @@ public:
         }
     }
 
-    void shuffleMines() {
+    void shuffleMines()
+    {
         std::vector<std::pair<int, int>> emptyCells;
         std::vector<std::pair<int, int>> mines;
 
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                if (!grid[i][j].checkIfRevealed()) {
+        for (int i = 0; i < rows; i++)
+        {
+            for (int j = 0; j < cols; j++)
+            {
+                if (!grid[i][j].checkIfRevealed())
+                {
                     if (grid[i][j].checkIfFlagged())
                     {
                         grid[i][j].toggleFlag();
                     }
-                    if (grid[i][j].isMine()) {
+                    if (grid[i][j].isMine())
+                    {
                         mines.emplace_back(i, j);
-                    } else {
+                    }
+                    else
+                    {
                         emptyCells.emplace_back(i, j);
                     }
                 }
             }
         }
 
-        if (emptyCells.size() < mines.size()) {
+        if (emptyCells.size() < mines.size())
+        {
             return;
         }
 
-        for (auto& [x, y] : mines) {
+        for (auto& [x, y] : mines)
+        {
             grid[x][y] = Cell(false);
         }
 
@@ -302,7 +317,8 @@ public:
         std::mt19937 gen(rd());
         std::ranges::shuffle(emptyCells, gen);
 
-        for (int i = 0; i < mineCount; i++) {
+        for (int i = 0; i < mineCount; i++)
+        {
             auto [x, y] = emptyCells[i];
             grid[x][y] = Cell(true);
         }
@@ -350,11 +366,13 @@ public:
     {
         int cellX, cellY;
         char action;
-        std::cout << "Enter a move (R x y to reveal, F x y to flag/unflag a cell or S to shuffle the mines): " << std::endl;
+        std::cout << "Enter a move (R x y to reveal, F x y to flag/unflag a cell or S to shuffle the mines): " <<
+            std::endl;
         std::cin >> action;
         if (std::toupper(action) != 'R' && std::toupper(action) != 'F' && std::toupper(action) != 'S')
         {
-            std::cout << "Invalid move! Enter R x y to reveal, F x y to flag/unflag a cell or S to shuffle the mines: " << std::endl;
+            std::cout << "Invalid move! Enter R x y to reveal, F x y to flag/unflag a cell or S to shuffle the mines: "
+                << std::endl;
             return;
         }
         if (std::toupper(action) == 'S')
@@ -392,10 +410,9 @@ class Player
 {
 private:
     std::string nickname;
-    int highscore;
-
+    int score;
 public:
-    explicit Player(const std::string& nickname) : nickname(nickname), highscore(0)
+    explicit Player(const std::string& nickname) : nickname(nickname), score(0)
     {
     }
 
@@ -403,18 +420,27 @@ public:
     {
         return nickname;
     }
-    [[nodiscard]] int getHighscore() const
+    [[nodiscard]] int getScore() const
     {
-        return highscore;
+        return score;
+    }
+
+    void setNickname(const std::string& nickname)
+    {
+        this->nickname = nickname;
+    }
+
+    void setScore(int score)
+    {
+        this->score = score;
     }
 
     friend std::ostream& operator<<(std::ostream& os, const Player& player)
     {
-        os << player.nickname << " " << player.highscore;
+        os << player.nickname << " " << player.score;
         return os;
     }
 };
-
 
 class Game
 {
@@ -422,11 +448,13 @@ private:
     Minefield minefield;
     Player player;
     bool gameOver;
+    std::chrono::steady_clock::time_point startTime;
+    std::chrono::milliseconds totalTime;
+    std::atomic<bool> timeExpired;
 
 public:
-    // Game(const int rows, const int cols, const int mineCount, const std::string& nickname): field(rows, cols, mineCount), player(nickname), gameOver(false) {}
     Game(const Minefield& minefield, const Player& player) : minefield(minefield), player(player),
-                                                             gameOver(false)
+                                                             gameOver(false), totalTime(std::chrono::minutes(1)), timeExpired(false)
     {
     }
 
@@ -437,7 +465,7 @@ public:
             os << "Game over!" << std::endl;
         }
         os << "Player: " << game.player.getNickname() << std::endl;
-        os << "Score: " << game.player.getHighscore() << std::endl;
+        os << "Score: " << game.player.getScore() << std::endl;
         os << "Minefield: " << std::endl;
         os << game.minefield << std::endl;
         return os;
@@ -470,6 +498,14 @@ public:
                     return false;
             }
         }
+        auto endTime = std::chrono::steady_clock::now();
+        std::chrono::milliseconds elapsedTime =
+            std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
+        std::chrono::milliseconds remainingTime = totalTime - elapsedTime;
+
+        int score = std::max(0, static_cast<int>(remainingTime.count()));
+        player.setScore(score);
+
         std::cout << "You won!" << std::endl;
         setGameOver();
         return true;
@@ -477,21 +513,54 @@ public:
 
     void play()
     {
+        int newRows = 0, newCols = 0, newMineCount = 0;
+        std::cout << "Enter board size (rows, cols) and number of mines: " << std::endl;
+        std::cin >> newRows >> newCols >> newMineCount;
+        minefield.setFieldSize(newRows, newCols, newMineCount);
+
+        std::cout << "Enter you nickname: " << std::endl;
+        std::string nickname;
+        std::cin >> nickname;
+        player.setNickname(nickname);
+
         std::cout << "Welcome to MineMaster, " << player.getNickname() << "!" << std::endl;
-        setTimeout([this]() {
+
+        setTimeout([this]
+        {
             if (!gameOver)
             {
-                std::cout << "Time's up! You lost!" << std::endl;
+                std::cout << "\nTime's up! Game over!" << std::endl;
+                timeExpired = true;
+                setGameOver();
             }
             exit(0);
-        }, std::chrono::minutes(5));
+        }, totalTime);
 
-        while (!isGameOver())
+        startTime = std::chrono::steady_clock::now();
+
+        while (!timeExpired && !isGameOver())
         {
-            std::cout << minefield << std::endl;
+            displayRemainingTime();
+            std::cout << "\n" << minefield << std::endl;
             minefield.processMove();
         }
-        std::cout << *this << std::endl;
+
+        if (timeExpired)
+            return;
+
+        displayRemainingTime();
+        std::cout << "\n" << *this << std::endl;
+
+        char choice;
+        std::cout << "Play again? (y/n): " << std::endl;
+        std::cin >> choice;
+        if (std::toupper(choice) == 'Y')
+        {
+            gameOver = false;
+            timeExpired = false;
+            minefield.setFirstMove();
+            play();
+        }
     }
 
     void setTimeout(const std::function<void()>& func, std::chrono::milliseconds delay)
@@ -502,8 +571,20 @@ public:
             func();
         }).detach();
     }
-};
 
+    void displayRemainingTime() const
+    {
+        auto now = std::chrono::steady_clock::now();
+        auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - startTime).count();
+        int remaining = std::chrono::duration_cast<std::chrono::seconds>(totalTime).count() - elapsed;
+        if (remaining < 0) remaining = 0;
+
+        int minutes = remaining / 60;
+        int seconds = remaining % 60;
+
+        std::cout << "Time left: " << minutes << ":" << (seconds < 10 ? "0" : "") << seconds  << std::endl;
+    }
+};
 SomeClass* getC()
 {
     return new SomeClass{2};
@@ -513,16 +594,9 @@ SomeClass* getC()
 int main()
 {
     Minefield minefield(8, 8, 9);
-
-    int newRows = 0, newCols = 0, newMineCount = 0;
-    std::cout << "Enter board size (rows, cols) and number of mines: ";
-    std::cin >> newRows >> newCols >> newMineCount;
-    minefield.setFieldSize(newRows, newCols, newMineCount);
-
-    Player player("Bogdan");
+    Player player("Player1");
     Game game(minefield, player);
     game.play();
-
 
     /// Observație: dacă aveți nevoie să citiți date de intrare de la tastatură,
     /// dați exemple de date de intrare folosind fișierul tastatura.txt
@@ -569,8 +643,7 @@ int main()
     /// NOTE: mandatory use one of vsync or FPS limit (not both)            ///
     /// This is needed so we do not burn the GPU                            ///
     window.setVerticalSyncEnabled(true);
-    ///
-       /// window.setFramerateLimit(60);                                       ///
+    /// window.setFramerateLimit(60);                                       ///
 
     while (window.isOpen())
     {
@@ -596,8 +669,8 @@ int main()
                 break;
             }
         }
-        if (shouldExit)
-        {
+        if (shouldExit){
+        
             window.close();
             break;
         }
@@ -609,3 +682,4 @@ int main()
     }
     return 0;
 }
+
