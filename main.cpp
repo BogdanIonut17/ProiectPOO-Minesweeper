@@ -411,6 +411,7 @@ class Player
 private:
     std::string nickname;
     int score;
+
 public:
     explicit Player(const std::string& nickname) : nickname(nickname), score(0)
     {
@@ -420,6 +421,7 @@ public:
     {
         return nickname;
     }
+
     [[nodiscard]] int getScore() const
     {
         return score;
@@ -454,7 +456,8 @@ private:
 
 public:
     Game(const Minefield& minefield, const Player& player) : minefield(minefield), player(player),
-                                                             gameOver(false), totalTime(std::chrono::minutes(1)), timeExpired(false)
+                                                             gameOver(false), totalTime(std::chrono::minutes(5)),
+                                                             timeExpired(false)
     {
     }
 
@@ -503,8 +506,8 @@ public:
             std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
         std::chrono::milliseconds remainingTime = totalTime - elapsedTime;
 
-        int score = std::max(0, static_cast<int>(remainingTime.count()));
-        player.setScore(score);
+        int playerScore = std::max(0, static_cast<int>(remainingTime.count()));
+        player.setScore(playerScore);
 
         std::cout << "You won!" << std::endl;
         setGameOver();
@@ -518,10 +521,10 @@ public:
         std::cin >> newRows >> newCols >> newMineCount;
         minefield.setFieldSize(newRows, newCols, newMineCount);
 
-        std::cout << "Enter you nickname: " << std::endl;
-        std::string nickname;
-        std::cin >> nickname;
-        player.setNickname(nickname);
+        std::cout << "Enter your nickname: " << std::endl;
+        std::string newNickname;
+        std::cin >> newNickname;
+        player.setNickname(newNickname);
 
         std::cout << "Welcome to MineMaster, " << player.getNickname() << "!" << std::endl;
 
