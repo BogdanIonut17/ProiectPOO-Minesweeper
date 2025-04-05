@@ -427,14 +427,14 @@ public:
         return score;
     }
 
-    void setNickname(const std::string& nickname)
+    void setNickname(const std::string& newNickname)
     {
-        this->nickname = nickname;
+        nickname = newNickname;
     }
 
-    void setScore(int score)
+    void setScore(int playerScore)
     {
-        this->score = score;
+        score = playerScore;
     }
 
     friend std::ostream& operator<<(std::ostream& os, const Player& player)
