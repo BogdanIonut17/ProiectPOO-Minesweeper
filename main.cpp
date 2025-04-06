@@ -99,7 +99,7 @@ public:
         isFlagged = !isFlagged;
     }
 
-    void setAdjacentMines(int adjacent_mines)
+    void setAdjacentMines(const int adjacent_mines)
     {
         adjacentMines = adjacent_mines;
     }
@@ -117,41 +117,33 @@ private:
     std::vector<std::vector<Cell>> grid;
     bool firstMove;
 
-public:
-    Minefield(const int rows, const int cols, const int mineCount) : rows(rows), cols(cols),
-                                                                     mineCount(mineCount),
-                                                                     grid(rows, std::vector<Cell>(cols)),
-                                                                     firstMove(true)
+    [[nodiscard]] bool isValidMove(const int x, const int y) const
     {
+        return x >= 0 && x < rows && y >= 0 && y < cols;
     }
 
-    [[nodiscard]] int getRows() const { return rows; }
-
-    [[nodiscard]] int getCols() const { return cols; }
-
-    Cell& getCell(int x, int y) { return grid[x][y]; }
-
-    [[nodiscard]] const Cell& getCell(int x, int y) const { return grid[x][y]; }
-
-    void setFirstMove()
-    {
-        firstMove = true;
-    }
-
-    void generateMines(int firstX, int firstY)
+    void generateMines(const int firstX, const int firstY)
     {
         std::random_device rd;
         std::mt19937 gen(rd());
         std::uniform_int_distribution distRow(0, rows - 1);
         std::uniform_int_distribution distCol(0, cols - 1);
         int minesPlaced = 0;
-        while (minesPlaced < mineCount)
+        const int totalMineCount = mineCount + countFlags();
+        while (minesPlaced < totalMineCount)
         {
-            int mineX = distRow(gen);
-            int mineY = distCol(gen);
+            const int mineX = distRow(gen);
+            const int mineY = distCol(gen);
             if ((mineX == firstX && mineY == firstY) || grid[mineX][mineY].isMine())
                 continue;
+            bool flagged = false;
+            if (grid[mineX][mineY].checkIfFlagged())
+                flagged = true;
             grid[mineX][mineY] = Cell(true);
+            if (flagged)
+            {
+                grid[mineX][mineY].toggleFlag();
+            }
             minesPlaced++;
         }
     }
@@ -178,29 +170,20 @@ public:
         }
     }
 
-    void revealCell(const int cellX, const int cellY)
+    [[nodiscard]] int countFlags() const
     {
-        if (grid[cellX][cellY].checkIfFlagged())
-            return;
-        if (grid[cellX][cellY].checkIfRevealed() && grid[cellX][cellY].getAdjacentMines() > 0)
+        int flagCount = 0;
+        for (int i = 0; i < rows; i++)
         {
-            chordReveal(cellX, cellY);
-            return;
+            for (int j = 0; j < cols; j++)
+            {
+                if (grid[i][j].checkIfFlagged())
+                {
+                    flagCount++;
+                }
+            }
         }
-        if (firstMove)
-        {
-            generateMines(cellX, cellY);
-            countAdjacentMines();
-            firstMove = false;
-        }
-        if (grid[cellX][cellY].getAdjacentMines() == 0 && !grid[cellX][cellY].isMine())
-        {
-            BFSReveal(cellX, cellY);
-        }
-        else
-        {
-            grid[cellX][cellY].reveal();
-        }
+        return flagCount;
     }
 
     void BFSReveal(int startX, int startY)
@@ -240,11 +223,8 @@ public:
         }
     }
 
-    void chordReveal(int x, int y)
+    void chordReveal(const int x, const int y)
     {
-        if (!grid[x][y].checkIfRevealed() || grid[x][y].getAdjacentMines() == 0)
-            return;
-
         int flagCount = 0;
         std::vector<std::pair<int, int>> toReveal;
 
@@ -273,6 +253,52 @@ public:
             {
                 revealCell(adjX, adjY);
             }
+        }
+    }
+
+public:
+    Minefield(const int rows, const int cols, const int mineCount) : rows(rows), cols(cols),
+                                                                     mineCount(mineCount),
+                                                                     grid(rows, std::vector<Cell>(cols)),
+                                                                     firstMove(true)
+    {
+    }
+
+    [[nodiscard]] int getRows() const { return rows; }
+
+    [[nodiscard]] int getCols() const { return cols; }
+
+    Cell& getCell(const int x, const int y) { return grid[x][y]; }
+
+    [[nodiscard]] const Cell& getCell(const int x, const int y) const { return grid[x][y]; }
+
+    void setFirstMove()
+    {
+        firstMove = true;
+    }
+
+    void revealCell(const int cellX, const int cellY)
+    {
+        if (grid[cellX][cellY].checkIfFlagged())
+            return;
+        if (grid[cellX][cellY].checkIfRevealed() && grid[cellX][cellY].getAdjacentMines() > 0)
+        {
+            chordReveal(cellX, cellY);
+            return;
+        }
+        if (firstMove)
+        {
+            generateMines(cellX, cellY);
+            countAdjacentMines();
+            firstMove = false;
+        }
+        if (grid[cellX][cellY].getAdjacentMines() == 0 && !grid[cellX][cellY].isMine())
+        {
+            BFSReveal(cellX, cellY);
+        }
+        else
+        {
+            grid[cellX][cellY].reveal();
         }
     }
 
@@ -317,6 +343,8 @@ public:
         std::mt19937 gen(rd());
         std::ranges::shuffle(emptyCells, gen);
 
+        mineCount = mines.size();
+
         for (int i = 0; i < mineCount; i++)
         {
             auto [x, y] = emptyCells[i];
@@ -326,10 +354,9 @@ public:
         countAdjacentMines();
     }
 
-
     void setFieldSize(const int newRows, const int newCols, const int newMineCount)
     {
-        if (newRows <= 0 || newCols <= 0 || newMineCount < 0 || newMineCount > newRows * newCols)
+        if (newRows <= 0 || newCols <= 0 || newMineCount < 0 || newMineCount >= newRows * newCols)
         {
             std::cout << "Invalid board size or mine count!" << std::endl;
             return;
@@ -339,7 +366,6 @@ public:
         mineCount = newMineCount;
         grid = std::vector(rows, std::vector<Cell>(cols));
     }
-
 
     void flagCell(const int x, const int y)
     {
@@ -355,11 +381,6 @@ public:
                 mineCount++;
             }
         }
-    }
-
-    [[nodiscard]] bool isValidMove(const int x, const int y) const
-    {
-        return x >= 0 && x < rows && y >= 0 and y < cols;
     }
 
     void processMove()
@@ -398,10 +419,11 @@ public:
             for (int j = 0; j < minefield.cols; j++)
             {
                 os << minefield.grid[i][j] << " ";
+                // minefield.grid[i][j].display();
             }
             os << std::endl;
         }
-        std::cout << "Number of mines: " << minefield.mineCount << std::endl;
+        std::cout << "\nNumber of mines: " << minefield.mineCount << std::endl;
         return os;
     }
 };
@@ -432,7 +454,7 @@ public:
         nickname = newNickname;
     }
 
-    void setScore(int playerScore)
+    void setScore(const int playerScore)
     {
         score = playerScore;
     }
@@ -453,11 +475,74 @@ private:
     std::chrono::steady_clock::time_point startTime;
     std::chrono::milliseconds totalTime;
     std::atomic<bool> timeExpired;
+    bool firstGame;
+
+    void setGameOver()
+    {
+        gameOver = true;
+    }
+
+    bool isGameOver()
+    {
+        for (int i = 0; i < minefield.getRows(); i++)
+        {
+            for (int j = 0; j < minefield.getCols(); j++)
+            {
+                if (minefield.getCell(i, j).isMine() && minefield.getCell(i, j).checkIfRevealed())
+                {
+                    std::cout << "\nYou revealed a mine!" << std::endl;
+                    setGameOver();
+                    return true;
+                }
+            }
+        }
+        for (int i = 0; i < minefield.getRows(); i++)
+        {
+            for (int j = 0; j < minefield.getCols(); j++)
+            {
+                if (!minefield.getCell(i, j).isMine() && !minefield.getCell(i, j).checkIfRevealed())
+                    return false;
+            }
+        }
+        const auto endTime = std::chrono::steady_clock::now();
+        const std::chrono::milliseconds elapsedTime =
+            std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
+        const std::chrono::milliseconds remainingTime = totalTime - elapsedTime;
+
+        const int playerScore = std::max(0, static_cast<int>(remainingTime.count()));
+        player.setScore(playerScore);
+
+        std::cout << "\nYou won!" << std::endl;
+        setGameOver();
+        return true;
+    }
+
+    void setTimeout(const std::function<void()>& func, std::chrono::milliseconds delay)
+    {
+        std::thread([func, delay]
+        {
+            std::this_thread::sleep_for(delay);
+            func();
+        }).detach();
+    }
+
+    void displayRemainingTime() const
+    {
+        const auto now = std::chrono::steady_clock::now();
+        const auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - startTime).count();
+        int remaining = std::chrono::duration_cast<std::chrono::seconds>(totalTime).count() - elapsed;
+        if (remaining < 0) remaining = 0;
+
+        const int minutes = remaining / 60;
+        const int seconds = remaining % 60;
+
+        std::cout << "Time left: " << minutes << ":" << (seconds < 10 ? "0" : "") << seconds  << std::endl;
+    }
 
 public:
     Game(const Minefield& minefield, const Player& player) : minefield(minefield), player(player),
-                                                             gameOver(false), totalTime(std::chrono::minutes(5)),
-                                                             timeExpired(false)
+                                                             gameOver(false), startTime(std::chrono::steady_clock::now()),totalTime(std::chrono::minutes(5)),
+                                                             timeExpired(false), firstGame(true)
     {
     }
 
@@ -474,49 +559,9 @@ public:
         return os;
     }
 
-    void setGameOver()
-    {
-        gameOver = true;
-    }
-
-    bool isGameOver()
-    {
-        for (int i = 0; i < minefield.getRows(); i++)
-        {
-            for (int j = 0; j < minefield.getCols(); j++)
-            {
-                if (minefield.getCell(i, j).isMine() && minefield.getCell(i, j).checkIfRevealed())
-                {
-                    std::cout << "You revealed a mine!" << std::endl;
-                    setGameOver();
-                    return true;
-                }
-            }
-        }
-        for (int i = 0; i < minefield.getRows(); i++)
-        {
-            for (int j = 0; j < minefield.getCols(); j++)
-            {
-                if (!minefield.getCell(i, j).isMine() && !minefield.getCell(i, j).checkIfRevealed())
-                    return false;
-            }
-        }
-        auto endTime = std::chrono::steady_clock::now();
-        std::chrono::milliseconds elapsedTime =
-            std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
-        std::chrono::milliseconds remainingTime = totalTime - elapsedTime;
-
-        int playerScore = std::max(0, static_cast<int>(remainingTime.count()));
-        player.setScore(playerScore);
-
-        std::cout << "You won!" << std::endl;
-        setGameOver();
-        return true;
-    }
-
     void play()
     {
-        int newRows = 0, newCols = 0, newMineCount = 0;
+        int newRows = 8, newCols = 8, newMineCount = 9;
         std::cout << "Enter board size (rows, cols) and number of mines: " << std::endl;
         std::cin >> newRows >> newCols >> newMineCount;
         minefield.setFieldSize(newRows, newCols, newMineCount);
@@ -539,7 +584,11 @@ public:
             exit(0);
         }, totalTime);
 
-        startTime = std::chrono::steady_clock::now();
+        if (firstGame)
+        {
+            startTime = std::chrono::steady_clock::now();
+            firstGame = false;
+        }
 
         while (!timeExpired && !isGameOver())
         {
@@ -564,28 +613,6 @@ public:
             minefield.setFirstMove();
             play();
         }
-    }
-
-    void setTimeout(const std::function<void()>& func, std::chrono::milliseconds delay)
-    {
-        std::thread([func, delay]
-        {
-            std::this_thread::sleep_for(delay);
-            func();
-        }).detach();
-    }
-
-    void displayRemainingTime() const
-    {
-        auto now = std::chrono::steady_clock::now();
-        auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - startTime).count();
-        int remaining = std::chrono::duration_cast<std::chrono::seconds>(totalTime).count() - elapsed;
-        if (remaining < 0) remaining = 0;
-
-        int minutes = remaining / 60;
-        int seconds = remaining % 60;
-
-        std::cout << "Time left: " << minutes << ":" << (seconds < 10 ? "0" : "") << seconds  << std::endl;
     }
 };
 SomeClass* getC()
