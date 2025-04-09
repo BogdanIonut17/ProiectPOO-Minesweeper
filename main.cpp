@@ -3,19 +3,10 @@
 #include <thread>
 #include <SFML/Graphics.hpp>
 #include <queue>
-#include <Helper.h>
 #include <ostream>
 #include <random>
 #include <functional>
-
-//////////////////////////////////////////////////////////////////////
-/// This class is used to test that the memory leak checks work as expected even when using a GUI
-class SomeClass {
-public:
-    explicit SomeClass(int)
-    {
-    }
-};
+#include <iomanip>
 
 
 class Cell
@@ -408,18 +399,27 @@ public:
 
     friend std::ostream& operator<<(std::ostream& os, const Minefield& minefield)
     {
-
-        for (int i = 0; i < minefield.rows; i++)
+        os << "   ";
+        for (int j = 0; j < minefield.cols; ++j)
         {
-            for (int j = 0; j < minefield.cols; j++)
+            os << std::setw(3) << j;
+        }
+        os << std::endl;
+
+        for (int i = 0; i < minefield.rows; ++i)
+        {
+            os << std::setw(3) << i;
+            for (int j = 0; j < minefield.cols; ++j)
             {
-                os << minefield.grid[i][j] << " ";
+                os << std::setw(3) << minefield.grid[i][j];
             }
             os << std::endl;
         }
-        std::cout << "\nNumber of mines: " << minefield.mineCount << std::endl;
+
+        os << "\nNumber of mines: " << minefield.mineCount << std::endl;
         return os;
     }
+
 };
 
 class Player
@@ -468,6 +468,7 @@ private:
     bool gameOver;
     std::chrono::steady_clock::time_point startTime;
     std::chrono::milliseconds totalTime;
+    const std::chrono::seconds roundDuration;
     std::atomic<bool> timeExpired;
     bool firstGame;
 
@@ -501,7 +502,7 @@ private:
         const auto endTime = std::chrono::steady_clock::now();
         const std::chrono::milliseconds elapsedTime =
             std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
-        const std::chrono::milliseconds gameTimeLeft = std::chrono::seconds(60) - elapsedTime;
+        const std::chrono::milliseconds gameTimeLeft = roundDuration - elapsedTime;
 
         const int playerScore = std::max(0, static_cast<int>(gameTimeLeft.count()));
         player.setScore(playerScore);
@@ -525,7 +526,7 @@ private:
         }).detach();
     }
 
-    void displayRemainingTime(const std::chrono::seconds roundDuration) const
+    void displayRemainingTime() const
     {
         const auto now = std::chrono::steady_clock::now();
         const auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - startTime).count();
@@ -538,12 +539,11 @@ private:
         std::cout << "Time left: " << minutes << ":" << (seconds < 10 ? "0" : "") << seconds << std::endl;
     }
 
-
 public:
-    Game(const Minefield& minefield, const Player& player) : minefield(minefield), player(player),
+    Game(const Minefield& minefield, const Player& player, const std::chrono::milliseconds time, const std::chrono::minutes duration) : minefield(minefield), player(player),
                                                              gameOver(false),
                                                              startTime(std::chrono::steady_clock::now()),
-                                                             totalTime(std::chrono::minutes(5)),
+                                                             totalTime(time), roundDuration(duration),
                                                              timeExpired(false), firstGame(true)
     {
     }
@@ -561,193 +561,183 @@ public:
         return os;
     }
 
-void play()
-{
-    const std::chrono::seconds roundDuration(60);
-
-    while (!timeExpired)
+    void play()
     {
-        gameOver = false;
-        minefield.setFirstMove();
-
-        int newRows = 0, newCols = 0, newMineCount = 0;
-        std::cout << "Enter board size (rows, cols) and number of mines: " << std::endl;
-        std::cin >> newRows >> newCols >> newMineCount;
-
-        if (!isValidConfiguration(newRows, newCols, newMineCount))
+        while (!timeExpired)
         {
-            std::cout << "Invalid board configuration! Defaulting to 8x8 with 9 mines." << std::endl;
-            newRows = 8;
-            newCols = 8;
-            newMineCount = 9;
-        }
+            gameOver = false;
+            minefield.setFirstMove();
 
-        minefield.setFieldSize(newRows, newCols, newMineCount);
+            int newRows = 0, newCols = 0, newMineCount = 0;
+            std::cout << "Enter board size (rows, cols) and number of mines: " << std::endl;
+            std::cin >> newRows >> newCols >> newMineCount;
 
-        std::cout << "Enter your nickname: " << std::endl;
-        std::string newNickname;
-        std::cin >> newNickname;
-        player.setNickname(newNickname);
-
-        std::cout << "Welcome to MineMaster, " << player.getNickname() << "!" << std::endl;
-
-        if (firstGame)
-        {
-            setTimeout([this]
+            if (!isValidConfiguration(newRows, newCols, newMineCount))
             {
+                std::cout << "Invalid board configuration! Defaulting to 8x8 with 9 mines." << std::endl;
+                newRows = 8;
+                newCols = 8;
+                newMineCount = 9;
+            }
+
+            minefield.setFieldSize(newRows, newCols, newMineCount);
+
+            std::cout << "Enter your nickname: " << std::endl;
+            std::string newNickname;
+            std::cin >> newNickname;
+            player.setNickname(newNickname);
+
+            std::cout << "Welcome to MineMaster, " << player.getNickname() << "!" << std::endl;
+
+            if (firstGame)
+            {
+                setTimeout([this]
+                {
+                    if (!gameOver)
+                    {
+                        std::cout << "\nTime's up! Game over!\n";
+                        timeExpired = true;
+                        setGameOver();
+                    }
+                    std::exit(0);
+                }, totalTime);
+                firstGame = false;
+            }
+
+            startTime = std::chrono::steady_clock::now();
+
+            std::atomic roundExpired = false;
+            std::thread roundTimer([&]
+            {
+                std::this_thread::sleep_for(roundDuration);
                 if (!gameOver)
                 {
-                    std::cout << "\nTime's up! Game over!\n";
-                    timeExpired = true;
-                    setGameOver();
-                    std::exit(0);
+                    roundExpired = true;
+                    gameOver = true;
                 }
-            }, totalTime);
-            firstGame = false;
-        }
+            });
 
-        startTime = std::chrono::steady_clock::now();
-
-        std::atomic roundExpired = false;
-        std::thread roundTimer([&]
-        {
-            std::this_thread::sleep_for(roundDuration);
-            if (!gameOver)
+            while (!gameOver && !timeExpired && !roundExpired)
             {
-                roundExpired = true;
-                gameOver = true;
+                displayRemainingTime();
+                std::cout << "\n" << minefield << std::endl;
+
+                minefield.processMove();
+
+                if (isGameOver())
+                {
+                    break;
+                }
             }
-        });
 
-        while (!gameOver && !timeExpired && !roundExpired)
-        {
-            displayRemainingTime(roundDuration);
-            std::cout << "\n" << minefield << std::endl;
+            if (roundTimer.joinable())
+                roundTimer.detach();
 
-            minefield.processMove();
-
-            if (isGameOver())
+            if (roundExpired)
             {
+                std::cout << "\nThis round has expired!" << std::endl;
+            }
+
+            displayRemainingTime();
+            std::cout << "\n" << *this << std::endl;
+
+            if (timeExpired)
+                return;
+
+            char choice;
+            std::cout << "Play again? Type y: " << std::endl;
+            std::cin >> choice;
+            if (std::toupper(choice) != 'Y')
                 break;
-            }
         }
-
-        if (roundTimer.joinable())
-            roundTimer.detach();
-
-        if (roundExpired)
-        {
-            std::cout << "\nThis round has expired!" << std::endl;
-        }
-
-        displayRemainingTime(roundDuration);
-        std::cout << "\n" << *this << std::endl;
-
-        if (timeExpired)
-            return;
-
-        char choice;
-        std::cout << "Play again? (y/n): " << std::endl;
-        std::cin >> choice;
-        if (std::toupper(choice) != 'Y')
-            break;
     }
-}
 };
-    SomeClass* getC()
-    {
-        return new SomeClass{2};
-    }
 
 
 int main()
 {
-        Minefield minefield(8, 8, 9);
-        Player player("Player1");
-        Game game(minefield, player);
-        game.play();
+    const Minefield minefield(8, 8, 9);
+    const Player player("Player1");
+    Game game(minefield, player, std::chrono::minutes(7), std::chrono::minutes(3));
+    game.play();
 
-        /// Observație: dacă aveți nevoie să citiți date de intrare de la tastatură,
-        /// dați exemple de date de intrare folosind fișierul tastatura.txt
-        /// Trebuie să aveți în fișierul tastatura.txt suficiente date de intrare
-        /// (în formatul impus de voi) astfel încât execuția programului să se încheie.
-        /// De asemenea, trebuie să adăugați în acest fișier date de intrare
-        /// pentru cât mai multe ramuri de execuție.
-        /// Dorim să facem acest lucru pentru a automatiza testarea codului, fără să
-        /// mai pierdem timp de fiecare dată să introducem de la zero aceleași date de intrare.
-        ///
-        /// Pe GitHub Actions (bife), fișierul tastatura.txt este folosit
-        /// pentru a simula date introduse de la tastatură.
-        /// Bifele verifică dacă programul are erori de compilare, erori de memorie și memory leaks.
-        ///
-        /// Dacă nu puneți în tastatura.txt suficiente date de intrare, îmi rezerv dreptul să vă
-        /// testez codul cu ce date de intrare am chef și să nu pun notă dacă găsesc vreun bug.
-        /// Impun această cerință ca să învățați să faceți un demo și să arătați părțile din
-        /// program care merg (și să le evitați pe cele care nu merg).
+    /// Observație: dacă aveți nevoie să citiți date de intrare de la tastatură,
+    /// dați exemple de date de intrare folosind fișierul tastatura.txt
+    /// Trebuie să aveți în fișierul tastatura.txt suficiente date de intrare
+    /// (în formatul impus de voi) astfel încât execuția programului să se încheie.
+    /// De asemenea, trebuie să adăugați în acest fișier date de intrare
+    /// pentru cât mai multe ramuri de execuție.
+    /// Dorim să facem acest lucru pentru a automatiza testarea codului, fără să
+    /// mai pierdem timp de fiecare dată să introducem de la zero aceleași date de intrare.
+    ///
+    /// Pe GitHub Actions (bife), fișierul tastatura.txt este folosit
+    /// pentru a simula date introduse de la tastatură.
+    /// Bifele verifică dacă programul are erori de compilare, erori de memorie și memory leaks.
+    ///
+    /// Dacă nu puneți în tastatura.txt suficiente date de intrare, îmi rezerv dreptul să vă
+    /// testez codul cu ce date de intrare am chef și să nu pun notă dacă găsesc vreun bug.
+    /// Impun această cerință ca să învățați să faceți un demo și să arătați părțile din
+    /// program care merg (și să le evitați pe cele care nu merg).
 
 
-        /// Pentru date citite din fișier, NU folosiți tastatura.txt. Creați-vă voi
-        /// alt fișier propriu cu ce alt nume doriți.
-        /// Exemplu:
-        /// std::ifstream fis("date.txt");
-        /// for(int i = 0; i < nr2; ++i)
-        ///     fis >> v2[i];
-        ///
-        ///////////////////////////////////////////////////////////////////////////
-        ///                Exemplu de utilizare cod generat                     ///
-        ///////////////////////////////////////////////////////////////////////////
-        Helper helper;
-        helper.help();
+    /// Pentru date citite din fișier, NU folosiți tastatura.txt. Creați-vă voi
+    /// alt fișier propriu cu ce alt nume doriți.
+    /// Exemplu:
+    /// std::ifstream fis("date.txt");
+    /// for(int i = 0; i < nr2; ++i)
+    ///     fis >> v2[i];
+    ///
+    ///////////////////////////////////////////////////////////////////////////
+    ///                Exemplu de utilizare cod generat                     ///
+    ///////////////////////////////////////////////////////////////////////////
+    // Helper helper;
+    // helper.help();
 
-        SomeClass* c = getC();
-        std::cout << c << "\n";
-        delete c; // comentarea acestui rând ar trebui să ducă la semnalarea unui mem leak
+    // sf::RenderWindow window;
+    ///////////////////////////////////////////////////////////////////////////
+    /// NOTE: sync with env variable APP_WINDOW from .github/workflows/cmake.yml:31
+    // window.create(sf::VideoMode({800, 700}), "MineMaster", sf::Style::Default);
 
-        sf::RenderWindow window;
-        ///////////////////////////////////////////////////////////////////////////
-        /// NOTE: sync with env variable APP_WINDOW from .github/workflows/cmake.yml:31
-        window.create(sf::VideoMode({800, 700}), "MineMaster", sf::Style::Default);
+    ///////////////////////////////////////////////////////////////////////////
+    /// NOTE: mandatory use one of vsync or FPS limit (not both)            ///
+    /// This is needed so we do not burn the GPU                            ///
+    // window.setVerticalSyncEnabled(true);
+    /// window.setFramerateLimit(60);                                       ///
 
-        ///////////////////////////////////////////////////////////////////////////
-        /// NOTE: mandatory use one of vsync or FPS limit (not both)            ///
-        /// This is needed so we do not burn the GPU                            ///
-        window.setVerticalSyncEnabled(true);
-        /// window.setFramerateLimit(60);                                       ///
-
-        while (window.isOpen())
-        {
-            bool shouldExit = false;
-            sf::Event e{};
-            while (window.pollEvent(e))
-            {
-                switch (e.type)
-                {
-                case sf::Event::Closed:
-                    window.close();
-                    break;
-                case sf::Event::Resized:
-                    std::cout << "New width: " << window.getSize().x << '\n'
-                        << "New height: " << window.getSize().y << '\n';
-                    break;
-                case sf::Event::KeyPressed:
-                    std::cout << "Received key " << (e.key.code == sf::Keyboard::X ? "X" : "(other)") << "\n";
-                    if (e.key.code == sf::Keyboard::Escape)
-                        shouldExit = true;
-                    break;
-                default:
-                    break;
-                }
-            }
-            if (shouldExit){
-
-                window.close();
-                break;
-            }
-            using namespace std::chrono_literals;
-            std::this_thread::sleep_for(300ms);
-
-            window.clear();
-            window.display();
-        }
-        return 0;
+    // while (window.isOpen())
+    // {
+    //     bool shouldExit = false;
+    //     sf::Event e{};
+    //     while (window.pollEvent(e))
+    //     {
+    //         switch (e.type)
+    //         {
+    //         case sf::Event::Closed:
+    //             window.close();
+    //             break;
+    //         case sf::Event::Resized:
+    //             std::cout << "New width: " << window.getSize().x << '\n'
+    //                 << "New height: " << window.getSize().y << '\n';
+    //             break;
+    //         case sf::Event::KeyPressed:
+    //             std::cout << "Received key " << (e.key.code == sf::Keyboard::X ? "X" : "(other)") << "\n";
+    //             if (e.key.code == sf::Keyboard::Escape)
+    //                 shouldExit = true;
+    //             break;
+    //         default:
+    //             break;
+    //         }
+    //     }
+    //     if (shouldExit)
+    //     {
+    //         window.close();
+    //         break;
+    //     }
+    //     using namespace std::chrono_literals;
+    //     std::this_thread::sleep_for(300ms);
+    //
+    //     window.clear();
+    //     window.display();
+    // }
+    return 0;
 }
