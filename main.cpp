@@ -419,7 +419,6 @@ public:
         os << "\nNumber of mines: " << minefield.mineCount << std::endl;
         return os;
     }
-
 };
 
 class Player
@@ -540,11 +539,12 @@ private:
     }
 
 public:
-    Game(const Minefield& minefield, const Player& player, const std::chrono::milliseconds time, const std::chrono::minutes duration) : minefield(minefield), player(player),
-                                                             gameOver(false),
-                                                             startTime(std::chrono::steady_clock::now()),
-                                                             totalTime(time), roundDuration(duration),
-                                                             timeExpired(false), firstGame(true)
+    Game(const Minefield& minefield, const Player& player, const std::chrono::milliseconds time,
+         const std::chrono::minutes duration) : minefield(minefield), player(player),
+                                                gameOver(false),
+                                                startTime(std::chrono::steady_clock::now()),
+                                                totalTime(time), roundDuration(duration),
+                                                timeExpired(false), firstGame(true)
     {
     }
 
@@ -658,7 +658,7 @@ int main()
 {
     const Minefield minefield(8, 8, 9);
     const Player player("Player1");
-    Game game(minefield, player, std::chrono::minutes(7), std::chrono::minutes(3));
+    Game game(minefield, player, std::chrono::minutes(5), std::chrono::minutes(3));
     game.play();
 
     /// Observație: dacă aveți nevoie să citiți date de intrare de la tastatură,
