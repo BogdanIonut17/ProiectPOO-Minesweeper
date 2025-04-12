@@ -12,6 +12,7 @@ class Player
 private:
     std::string nickname;
     int score;
+    static int highScore;
 
 public:
     explicit Player(const std::string& nickname);
@@ -20,11 +21,16 @@ public:
 
     [[nodiscard]] int getScore() const;
 
+    static int getHighScore();
+
     void setNickname(const std::string& newNickname);
 
     void setScore(int playerScore);
 
+    static void setHighScore(const Player& player);
+
     friend std::ostream& operator<<(std::ostream& os, const Player& player);
+
 };
 
 

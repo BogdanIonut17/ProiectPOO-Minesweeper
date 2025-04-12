@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include "Player.h"
+int Player::highScore = 0;
 
 Player::Player(const std::string& nickname): nickname(nickname), score(0)
 {
@@ -19,6 +20,11 @@ int Player::getScore() const
     return score;
 }
 
+int Player::getHighScore()
+{
+    return highScore;
+}
+
 void Player::setNickname(const std::string& newNickname)
 {
     nickname = newNickname;
@@ -27,6 +33,12 @@ void Player::setNickname(const std::string& newNickname)
 void Player::setScore(const int playerScore)
 {
     score = playerScore;
+}
+
+void Player::setHighScore(const Player& player)
+{
+    if (player.score > highScore)
+        highScore = player.score;
 }
 
 std::ostream& operator<<(std::ostream& os, const Player& player)

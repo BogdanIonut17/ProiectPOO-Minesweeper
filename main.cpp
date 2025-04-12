@@ -7,8 +7,6 @@
 #include "Player.h"
 
 
-
-
 int main()
 {
     const Minefield minefield(8, 8, 9);

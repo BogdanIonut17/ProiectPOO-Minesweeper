@@ -41,13 +41,14 @@ bool Game::isGameOver()
 
     const int playerScore = std::max(0, static_cast<int>(gameTimeLeft.count()));
     player.setScore(playerScore);
+    Player::setHighScore(player);
 
     std::cout << "\nYou won!" << std::endl;
     setGameOver();
     return true;
 }
 
-bool Game::isValidConfiguration(const int rows, const int cols, const int mineCount) const
+bool Game::isValidConfiguration(const int rows, const int cols, const int mineCount)
 {
     return rows > 0 && cols > 0 && mineCount > 0 && mineCount < rows * cols;
 }
@@ -61,18 +62,21 @@ void Game::setTimeout(const std::function<void()>& func, std::chrono::millisecon
     }).detach();
 }
 
-void Game::displayRemainingTime() const
+void Game::displayRemainingTime(const std::chrono::steady_clock::time_point roundStart) const
 {
     const auto now = std::chrono::steady_clock::now();
-    const auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - startTime).count();
-    int remaining = static_cast<int>(roundDuration.count()) - elapsed;
-    if (remaining < 0) remaining = 0;
+    const auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - roundStart);
+    auto remaining = std::chrono::duration_cast<std::chrono::seconds>(roundDuration - elapsed);
 
-    const int minutes = remaining / 60;
-    const int seconds = remaining % 60;
+    if (remaining.count() < 0)
+        remaining = std::chrono::seconds(0);
+
+    const int minutes = static_cast<int>(remaining.count() / 60);
+    const int seconds = static_cast<int>(remaining.count() % 60);
 
     std::cout << "Time left: " << minutes << ":" << (seconds < 10 ? "0" : "") << seconds << std::endl;
 }
+
 
 Game::Game(const Minefield& minefield, const Player& player, const std::chrono::milliseconds time,
     const std::chrono::minutes duration): minefield(minefield), player(player),
@@ -88,6 +92,7 @@ void Game::play()
     while (!timeExpired)
     {
         gameOver = false;
+        player.setScore(0);
         minefield.setFirstMove();
 
         int newRows = 0, newCols = 0, newMineCount = 0;
@@ -127,27 +132,34 @@ void Game::play()
         }
 
         startTime = std::chrono::steady_clock::now();
-
         std::atomic roundExpired = false;
+
         std::thread roundTimer([&]
         {
-            std::this_thread::sleep_for(roundDuration);
-            if (!gameOver)
+            const auto roundStart = startTime;
+            while (!gameOver && !roundExpired)
             {
-                roundExpired = true;
-                gameOver = true;
+                auto now = std::chrono::steady_clock::now();
+                if (now - roundStart >= roundDuration)
+                {
+                    roundExpired = true;
+                    gameOver = true;
+                    break;
+                }
+                std::this_thread::sleep_for(std::chrono::milliseconds(200));
             }
         });
 
         while (!gameOver && !timeExpired && !roundExpired)
         {
-            displayRemainingTime();
+            displayRemainingTime(startTime);
             std::cout << "\n" << minefield << std::endl;
 
             minefield.processMove();
 
             if (isGameOver())
             {
+                gameOver = true;
                 break;
             }
         }
@@ -160,7 +172,7 @@ void Game::play()
             std::cout << "\nThis round has expired!" << std::endl;
         }
 
-        displayRemainingTime();
+        displayRemainingTime(startTime);
         std::cout << "\n" << *this << std::endl;
 
         if (timeExpired)
@@ -182,6 +194,7 @@ std::ostream& operator<<(std::ostream& os, const Game& game)
     }
     os << "Player: " << game.player.getNickname() << std::endl;
     os << "Score: " << game.player.getScore() << std::endl;
+    os << "High score: " << Player::getHighScore() << std::endl;
     os << "Minefield: " << std::endl;
     os << game.minefield << std::endl;
     return os;

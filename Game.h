@@ -28,11 +28,11 @@ private:
 
     bool isGameOver();
 
-    [[nodiscard]] bool isValidConfiguration(int rows, int cols, int mineCount) const;
+    [[nodiscard]] static bool isValidConfiguration(int rows, int cols, int mineCount) ;
 
-    void setTimeout(const std::function<void()>& func, std::chrono::milliseconds delay);
+    static void setTimeout(const std::function<void()>& func, std::chrono::milliseconds delay);
 
-    void displayRemainingTime() const;
+    void displayRemainingTime(std::chrono::steady_clock::time_point roundStart) const;
 
 public:
     Game(const Minefield& minefield, const Player& player, std::chrono::milliseconds time,

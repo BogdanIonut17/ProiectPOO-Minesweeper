@@ -210,11 +210,9 @@ void Minefield::shuffleMines()
     {
         for (int j = 0; j < cols; j++)
         {
-            if (!grid[i][j].checkIfRevealed())
-            {
                 if (grid[i][j].checkIfFlagged())
                 {
-                    grid[i][j].toggleFlag();
+                    flagCell(i, j);
                 }
                 if (grid[i][j].isMine())
                 {
@@ -224,7 +222,6 @@ void Minefield::shuffleMines()
                 {
                     emptyCells.emplace_back(i, j);
                 }
-            }
         }
     }
 
@@ -241,8 +238,6 @@ void Minefield::shuffleMines()
     std::random_device rd;
     std::mt19937 gen(rd());
     std::ranges::shuffle(emptyCells, gen);
-
-    mineCount = mines.size();
 
     for (int i = 0; i < mineCount; i++)
     {
@@ -308,16 +303,16 @@ void Minefield::processMove()
 std::ostream& operator<<(std::ostream& os, const Minefield& minefield)
 {
     os << "   ";
-    for (int j = 0; j < minefield.cols; ++j)
+    for (int j = 0; j < minefield.cols; j++)
     {
         os << std::setw(3) << j;
     }
     os << std::endl;
 
-    for (int i = 0; i < minefield.rows; ++i)
+    for (int i = 0; i < minefield.rows; i++)
     {
         os << std::setw(3) << i;
-        for (int j = 0; j < minefield.cols; ++j)
+        for (int j = 0; j < minefield.cols; j++)
         {
             os << std::setw(3) << minefield.grid[i][j];
         }
