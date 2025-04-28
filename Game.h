@@ -40,7 +40,6 @@ private:
 
     void displayRemainingTime() const;
 
-
 public:
     Game(const Minefield& minefield, const Player& player, std::chrono::milliseconds time,
          std::chrono::minutes duration);

@@ -79,7 +79,6 @@ void Game::displayRemainingTime() const
     const int seconds = roundTimeLeftSeconds.load() % 60;
 
     std::cout << "Time left: " << minutes << ":" << (seconds < 10 ? "0" : "") << seconds << "   ";
-
 }
 
 Game::Game(const Minefield& minefield, const Player& player, const std::chrono::milliseconds time,

@@ -15,16 +15,6 @@ const std::string& Player::getNickname() const
     return nickname;
 }
 
-int Player::getScore() const
-{
-    return score;
-}
-
-int Player::getHighScore()
-{
-    return highScore;
-}
-
 void Player::setNickname(const std::string& newNickname)
 {
     nickname = newNickname;

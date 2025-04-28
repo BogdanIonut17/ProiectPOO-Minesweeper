@@ -19,10 +19,6 @@ public:
 
     [[nodiscard]] const std::string& getNickname() const;
 
-    [[nodiscard]] int getScore() const;
-
-    static int getHighScore();
-
     void setNickname(const std::string& newNickname);
 
     void setScore(int playerScore);
