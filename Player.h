@@ -27,10 +27,7 @@ public:
 
     void setScore(int playerScore);
 
-    static void setHighScore(const Player& player);
-
     friend std::ostream& operator<<(std::ostream& os, const Player& player);
-
 };
 
 

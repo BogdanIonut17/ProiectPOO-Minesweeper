@@ -33,16 +33,14 @@ void Player::setNickname(const std::string& newNickname)
 void Player::setScore(const int playerScore)
 {
     score = playerScore;
-}
-
-void Player::setHighScore(const Player& player)
-{
-    if (player.score > highScore)
-        highScore = player.score;
+    if (score > highScore)
+        highScore = score;
 }
 
 std::ostream& operator<<(std::ostream& os, const Player& player)
 {
-    os << player.nickname << " " << player.score;
+    os << "Player: " << player.nickname << std::endl;
+    os << "Score: " << player.score << std::endl;
+    os << "Highscore: " << Player::highScore << std::endl;
     return os;
 }

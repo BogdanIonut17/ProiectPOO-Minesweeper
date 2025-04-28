@@ -82,6 +82,7 @@ int Minefield::countFlags() const
     return flagCount;
 }
 
+// Reveals cells until a mine is found or a cell that has mine(s) adjacent to it
 void Minefield::BFSReveal(int startX, int startY)
 {
     if (!isValidMove(startX, startY))
@@ -119,6 +120,8 @@ void Minefield::BFSReveal(int startX, int startY)
     }
 }
 
+// When a revealed cell has as many adjacent flags as the number of mines displayed on it,
+// revealing it will reveal the cells next to it that are not flagged
 void Minefield::chordReveal(const int x, const int y)
 {
     int flagCount = 0;
@@ -218,7 +221,7 @@ void Minefield::shuffleMines()
                 {
                     mines.emplace_back(i, j);
                 }
-                else
+                else if (!grid[i][j].checkIfRevealed())
                 {
                     emptyCells.emplace_back(i, j);
                 }
@@ -302,6 +305,7 @@ void Minefield::processMove()
 
 std::ostream& operator<<(std::ostream& os, const Minefield& minefield)
 {
+    os << "Minefield: " << std::endl;
     os << "   ";
     for (int j = 0; j < minefield.cols; j++)
     {
