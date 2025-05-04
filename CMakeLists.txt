@@ -67,6 +67,12 @@ add_executable(${MAIN_EXECUTABLE_NAME}
         Player.h
         Game.cpp
         Game.h
+        EasyGame.cpp
+        EasyGame.h
+        MediumGame.cpp
+        MediumGame.h
+        HardGame.cpp
+        HardGame.h
 )
 
 # NOTE: Add all defined targets (e.g. executables, libraries, etc. )

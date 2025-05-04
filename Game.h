@@ -7,6 +7,7 @@
 #include <atomic>
 #include <chrono>
 #include <functional>
+#include <memory>
 
 #include "Minefield.h"
 #include "Player.h"
@@ -14,7 +15,7 @@
 
 class Game
 {
-private:
+protected:
     Minefield minefield;
     Player player;
     bool gameOver;
@@ -34,7 +35,7 @@ private:
 
     [[nodiscard]] static bool isValidConfiguration(int rows, int cols, int mineCount);
 
-    void setupRound();
+    virtual void setupRound();
 
     static void setTimeout(const std::function<void()>& func, std::chrono::milliseconds delay);
 
@@ -44,9 +45,19 @@ public:
     Game(const Minefield& minefield, const Player& player, std::chrono::milliseconds time,
          std::chrono::minutes duration);
 
+    Game(const Game& other);
+
+    Game& operator=(const Game& other);
+
+    virtual ~Game() = default;
+
     friend std::ostream& operator<<(std::ostream& os, const Game& game);
 
-    void play();
+    virtual void play();
+
+    [[nodiscard]] virtual std::unique_ptr<Game> clone() const = 0;
+
+    // void displayStatus() const;
 };
 
 

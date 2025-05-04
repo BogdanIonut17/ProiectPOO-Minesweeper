@@ -90,6 +90,31 @@ Game::Game(const Minefield& minefield, const Player& player, const std::chrono::
 {
 }
 
+Game::Game(const Game& other): minefield(other.minefield),
+                               player(other.player),
+                               gameOver(other.gameOver),
+                               gameWon(other.gameWon),
+                               startTime(other.startTime),
+                               totalTime(other.totalTime),
+                               roundDuration(other.roundDuration),
+                               firstGame(other.firstGame)
+{
+}
+
+Game& Game::operator=(const Game& other)
+{
+    if (this == &other)
+        return *this;
+    minefield = other.minefield;
+    player = other.player;
+    gameOver = other.gameOver;
+    gameWon = other.gameWon;
+    startTime = other.startTime;
+    totalTime = other.totalTime;
+    firstGame = other.firstGame;
+    return *this;
+}
+
 void Game::setupRound()
 {
     gameOver = false;

@@ -1,18 +1,42 @@
 #include <chrono>
-#include <thread>
 // #include <SFML/Graphics.hpp>
 
-#include "Game.h"
+#include <iostream>
+
 #include "Minefield.h"
 #include "Player.h"
+#include "Game.h"
+#include "EasyGame.h"
+#include "MediumGame.h"
+#include "HardGame.h"
+
 
 
 int main()
 {
+    std::unique_ptr<Game> game;
+
+    int choice;
+    std::cout << "Choose difficulty:\n1. Easy\n2. Medium\n3. Hard\n";
+    std::cin >> choice;
     const Minefield minefield(8, 8, 9);
     const Player player("Player1");
-    Game game(minefield, player, std::chrono::minutes(10), std::chrono::minutes(3));
-    game.play();
+    if (choice == 1)
+        game = std::make_unique<EasyGame>();
+    else if (choice == 2)
+        game = std::make_unique<MediumGame>();
+    else if (choice == 3)
+        game = std::make_unique<HardGame>();
+    else
+    {
+        std::cout << "Invalid choice! Defaulting to Easy.\n";
+        game = std::make_unique<EasyGame>();
+    }
+
+    game->play();
+
+    // EasyGame game(minefield, player, std::chrono::minutes(10), std::chrono::minutes(3));
+    // game.play();
 
     /// Observație: dacă aveți nevoie să citiți date de intrare de la tastatură,
     /// dați exemple de date de intrare folosind fișierul tastatura.txt
