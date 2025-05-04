@@ -7,7 +7,9 @@
 #include <iostream>
 #include <thread>
 
-MediumGame::MediumGame() : Game(minefield, player, std::chrono::minutes(15), std::chrono::minutes(5)) {}
+MediumGame::MediumGame() : Game(Minefield(16, 16, 40), Player("Player1"), std::chrono::minutes(15), std::chrono::minutes(5))
+{
+}
 
 MediumGame::MediumGame(const MediumGame& other): Game(other)
 {
@@ -21,11 +23,10 @@ MediumGame& MediumGame::operator=(const MediumGame& other)
     return *this;
 }
 
-    void MediumGame::setupRound()
+void MediumGame::setupRound()
 {
     gameOver = false;
     gameWon = false;
-    minefield.setFieldSize(16, 16, 40);
     player.setScore(0);
     minefield.setFirstMove();
 
@@ -38,7 +39,8 @@ MediumGame& MediumGame::operator=(const MediumGame& other)
     std::cout << "Medium mode: 16x16 board with 40 mines." << std::endl;
 }
 
-void MediumGame::play() {
+void MediumGame::play()
+{
     while (!timeExpired)
     {
         setupRound();
@@ -98,6 +100,7 @@ void MediumGame::play() {
     }
 }
 
-std::unique_ptr<Game> MediumGame::clone() const {
-    return std::make_unique<MediumGame>(*this);
-}
+// std::unique_ptr<Game> MediumGame::clone() const
+// {
+//     return std::make_unique<MediumGame>(*this);
+// }

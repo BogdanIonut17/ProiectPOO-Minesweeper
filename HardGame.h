@@ -7,7 +7,8 @@
 #include "Game.h"
 
 
-class HardGame : public Game{
+class HardGame : public Game
+{
 public:
     HardGame();
 
@@ -19,10 +20,8 @@ public:
 
     void play() override;
 
-    [[nodiscard]] std::unique_ptr<Game> clone() const override;
+    // [[nodiscard]] std::unique_ptr<Game> clone() const override;
 };
-
-
 
 
 #endif //HARDGAME_H

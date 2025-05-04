@@ -6,7 +6,7 @@
 #include <iostream>
 #include <thread>
 
-EasyGame::EasyGame() : Game(minefield, player, std::chrono::minutes(10), std::chrono::minutes(3)) {}
+EasyGame::EasyGame() : Game(Minefield(9, 9, 10), Player("Player1"), std::chrono::minutes(10), std::chrono::minutes(3)) {}
 
 EasyGame::EasyGame(const EasyGame& other): Game(other)
 {
@@ -24,7 +24,6 @@ void EasyGame::setupRound()
 {
     gameOver = false;
     gameWon = false;
-    minefield.setFieldSize(9, 9, 10);
     player.setScore(0);
     minefield.setFirstMove();
 
@@ -97,6 +96,6 @@ void EasyGame::play() {
     }
 }
 
-std::unique_ptr<Game> EasyGame::clone() const {
-    return std::make_unique<EasyGame>(*this);
-}
+// std::unique_ptr<Game> EasyGame::clone() const {
+//     return std::make_unique<EasyGame>(*this);
+// }

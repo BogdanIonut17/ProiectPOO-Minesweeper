@@ -55,7 +55,7 @@ public:
 
     virtual void play();
 
-    [[nodiscard]] virtual std::unique_ptr<Game> clone() const = 0;
+    // [[nodiscard]] virtual std::unique_ptr<Game> clone() const = 0;
 
     // void displayStatus() const;
 };

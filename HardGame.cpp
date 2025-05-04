@@ -7,7 +7,9 @@
 #include <iostream>
 #include <thread>
 
-HardGame::HardGame() : Game(minefield, player, std::chrono::minutes(10), std::chrono::minutes(10)) {}
+HardGame::HardGame() : Game(Minefield(16, 30, 99), Player("Player1"), std::chrono::minutes(10), std::chrono::minutes(10))
+{
+}
 
 HardGame::HardGame(const HardGame& other): Game(other)
 {
@@ -21,11 +23,10 @@ HardGame& HardGame::operator=(const HardGame& other)
     return *this;
 }
 
-    void HardGame::setupRound()
+void HardGame::setupRound()
 {
     gameOver = false;
     gameWon = false;
-    minefield.setFieldSize(30, 16, 99);
     player.setScore(0);
     minefield.setFirstMove();
 
@@ -35,10 +36,11 @@ HardGame& HardGame::operator=(const HardGame& other)
     player.setNickname(newNickname);
 
     std::cout << "Welcome to MineMaster, " << player.getNickname() << "!" << std::endl;
-    std::cout << "Hard mode: 30x16 board with 99 mines." << std::endl;
+    std::cout << "Hard mode: 16x30 board with 99 mines." << std::endl;
 }
 
-void HardGame::play() {
+void HardGame::play()
+{
     while (!timeExpired)
     {
         setupRound();
@@ -98,7 +100,8 @@ void HardGame::play() {
     }
 }
 
-std::unique_ptr<Game> HardGame::clone() const {
-    return std::make_unique<HardGame>(*this);
-}
+// std::unique_ptr<Game> HardGame::clone() const
+// {
+//     return std::make_unique<HardGame>(*this);
+// }
 

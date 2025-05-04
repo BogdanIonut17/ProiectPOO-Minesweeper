@@ -22,7 +22,7 @@ public:
 
     void play() override;
 
-    [[nodiscard]] std::unique_ptr<Game> clone() const override;
+    // [[nodiscard]] std::unique_ptr<Game> clone() const override;
 };
 
 
