@@ -28,6 +28,7 @@ void HardGame::setupRound()
     gameOver = false;
     gameWon = false;
     player.setScore(0);
+    minefield.setFieldSize(16, 30, 99);
     minefield.setFirstMove();
 
     std::cout << "Enter your nickname: " << std::endl;

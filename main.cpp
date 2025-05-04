@@ -3,36 +3,33 @@
 
 #include <iostream>
 
-#include "Minefield.h"
-#include "Player.h"
 #include "Game.h"
 #include "EasyGame.h"
+#include "GameController.h"
 #include "MediumGame.h"
 #include "HardGame.h"
 
 
 int main()
 {
-    std::unique_ptr<Game> game;
-
     int choice;
-    std::cout << "Choose difficulty:\n1. Easy\n2. Medium\n3. Hard\n";
+    std::cout << "Choose game mode: 1. Easy 2. Medium 3. Hard\n";
     std::cin >> choice;
-    const Minefield minefield(8, 8, 9);
-    const Player player("Player1");
-    if (choice == 1)
-        game = std::make_unique<EasyGame>();
-    else if (choice == 2)
-        game = std::make_unique<MediumGame>();
-    else if (choice == 3)
-        game = std::make_unique<HardGame>();
-    else
-    {
-        std::cout << "Invalid choice! Defaulting to Easy.\n";
-        game = std::make_unique<EasyGame>();
+
+    std::unique_ptr<Game> mode;
+
+    switch (choice) {
+    case 1: mode = std::make_unique<EasyGame>(); break;
+    case 2: mode = std::make_unique<MediumGame>(); break;
+    case 3: mode = std::make_unique<HardGame>(); break;
+    default:
+        std::cout << "Invalid choice. Defaulting to Easy.\n";
+        mode = std::make_unique<EasyGame>();
+        break;
     }
 
-    game->play();
+    const GameController controller(std::move(mode));
+    controller.run();
 
     // EasyGame game(minefield, player, std::chrono::minutes(10), std::chrono::minutes(3));
     // game.play();

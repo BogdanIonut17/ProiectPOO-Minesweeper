@@ -73,6 +73,8 @@ add_executable(${MAIN_EXECUTABLE_NAME}
         MediumGame.h
         HardGame.cpp
         HardGame.h
+        GameController.cpp
+        GameController.h
 )
 
 # NOTE: Add all defined targets (e.g. executables, libraries, etc. )

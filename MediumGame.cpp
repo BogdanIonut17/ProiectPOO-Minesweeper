@@ -28,6 +28,7 @@ void MediumGame::setupRound()
     gameOver = false;
     gameWon = false;
     player.setScore(0);
+    minefield.setFieldSize(16, 16, 40);
     minefield.setFirstMove();
 
     std::cout << "Enter your nickname: " << std::endl;
