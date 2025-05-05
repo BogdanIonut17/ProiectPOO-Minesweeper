@@ -122,19 +122,19 @@ void Game::setupRound()
     player.setScore(0);
     minefield.setFirstMove();
 
-    // int newRows = 0, newCols = 0, newMineCount = 0;
-    // std::cout << "Enter board size (rows, cols) and number of mines: " << std::endl;
-    // std::cin >> newRows >> newCols >> newMineCount;
+    int newRows = 0, newCols = 0, newMineCount = 0;
+    std::cout << "Enter board size (rows, cols) and number of mines: " << std::endl;
+    std::cin >> newRows >> newCols >> newMineCount;
 
-    // if (!isValidConfiguration(newRows, newCols, newMineCount))
-    // {
-    //     std::cout << "Invalid board configuration! Defaulting to 8x8 with 9 mines." << std::endl;
-    //     newRows = 8;
-    //     newCols = 8;
-    //     newMineCount = 9;
-    // }
+    if (!isValidConfiguration(newRows, newCols, newMineCount))
+    {
+        std::cout << "Invalid board configuration! Defaulting to 8x8 with 9 mines." << std::endl;
+        newRows = 8;
+        newCols = 8;
+        newMineCount = 9;
+    }
 
-    // minefield.setFieldSize(newRows, newCols, newMineCount);
+    minefield.setFieldSize(newRows, newCols, newMineCount);
 
     std::cout << "Enter your nickname: " << std::endl;
     std::string newNickname;
@@ -220,7 +220,9 @@ void Game::play()
     }
 }
 
-void Game::displayMode(std::ostream &) const{}
+void Game::displayMode(std::ostream&) const
+{
+}
 
 std::ostream& operator<<(std::ostream& os, const Game& game)
 {
@@ -228,7 +230,7 @@ std::ostream& operator<<(std::ostream& os, const Game& game)
     {
         os << "Game over!" << std::endl;
     }
-    os<< "\nDifficulty: ";
+    os << "\nDifficulty: ";
     game.displayMode(os);
     os << game.player << std::endl;
     os << game.minefield << std::endl;
