@@ -28,7 +28,6 @@ void MediumGame::setupRound()
     gameOver = false;
     gameWon = false;
     player.setScore(0);
-    minefield.setFieldSize(16, 16, 40);
     minefield.setFirstMove();
 
     std::cout << "Enter your nickname: " << std::endl;
@@ -37,6 +36,8 @@ void MediumGame::setupRound()
     player.setNickname(newNickname);
 
     std::cout << "Welcome to MineMaster, " << player.getNickname() << "!" << std::endl;
+
+    minefield.setFieldSize(16, 16, 40);
     std::cout << "Medium mode: 16x16 board with 40 mines." << std::endl;
 }
 
@@ -87,8 +88,8 @@ void MediumGame::play()
             std::cout << "\nThis round has expired!" << std::endl;
         }
 
-        displayRemainingTime();
-        std::cout << "\n" << *this << std::endl;
+        // displayRemainingTime();
+        std::cout << *this << std::endl;
 
         if (timeExpired)
             return;
@@ -101,7 +102,13 @@ void MediumGame::play()
     }
 }
 
-// std::unique_ptr<Game> MediumGame::clone() const
+void MediumGame::displayMode(std::ostream& os) const
+{
+    os << "Medium" << std::endl;
+}
+
+
+// std::shared_ptr<Game> MediumGame::clone() const
 // {
-//     return std::make_unique<MediumGame>(*this);
+//     return std::make_shared<MediumGame>(*this);
 // }

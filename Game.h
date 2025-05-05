@@ -55,7 +55,9 @@ public:
 
     virtual void play();
 
-    // [[nodiscard]] virtual std::unique_ptr<Game> clone() const = 0;
+    virtual void displayMode(std::ostream&) const;
+
+    // [[nodiscard]] virtual std::shared_ptr<Game> clone() const = 0;
 
     // void displayStatus() const;
 };

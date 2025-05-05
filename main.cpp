@@ -1,4 +1,3 @@
-#include <chrono>
 // #include <SFML/Graphics.hpp>
 
 #include <iostream>
@@ -13,18 +12,22 @@
 int main()
 {
     int choice;
-    std::cout << "Choose game mode: 1. Easy 2. Medium 3. Hard\n";
+    std::cout << "Choose gamemode: \n1. Easy \n2. Medium \n3. Hard" << std::endl;
     std::cin >> choice;
 
-    std::unique_ptr<Game> mode;
+    std::shared_ptr<Game> mode;
 
-    switch (choice) {
-    case 1: mode = std::make_unique<EasyGame>(); break;
-    case 2: mode = std::make_unique<MediumGame>(); break;
-    case 3: mode = std::make_unique<HardGame>(); break;
+    switch (choice)
+    {
+    case 1: mode = std::make_shared<EasyGame>();
+        break;
+    case 2: mode = std::make_shared<MediumGame>();
+        break;
+    case 3: mode = std::make_shared<HardGame>();
+        break;
     default:
         std::cout << "Invalid choice. Defaulting to Easy.\n";
-        mode = std::make_unique<EasyGame>();
+        mode = std::make_shared<EasyGame>();
         break;
     }
 

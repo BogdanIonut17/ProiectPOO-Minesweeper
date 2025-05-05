@@ -28,7 +28,6 @@ void HardGame::setupRound()
     gameOver = false;
     gameWon = false;
     player.setScore(0);
-    minefield.setFieldSize(16, 30, 99);
     minefield.setFirstMove();
 
     std::cout << "Enter your nickname: " << std::endl;
@@ -37,7 +36,9 @@ void HardGame::setupRound()
     player.setNickname(newNickname);
 
     std::cout << "Welcome to MineMaster, " << player.getNickname() << "!" << std::endl;
+
     std::cout << "Hard mode: 16x30 board with 99 mines." << std::endl;
+    minefield.setFieldSize(16, 30, 99);
 }
 
 void HardGame::play()
@@ -87,8 +88,8 @@ void HardGame::play()
             std::cout << "\nThis round has expired!" << std::endl;
         }
 
-        displayRemainingTime();
-        std::cout << "\n" << *this << std::endl;
+        // displayRemainingTime();
+        std::cout << *this << std::endl;
 
         if (timeExpired)
             return;
@@ -101,8 +102,13 @@ void HardGame::play()
     }
 }
 
-// std::unique_ptr<Game> HardGame::clone() const
+void HardGame::displayMode(std::ostream& os) const
+{
+    os << "Hard" << std::endl;
+}
+
+// std::shared_ptr<Game> HardGame::clone() const
 // {
-//     return std::make_unique<HardGame>(*this);
+//     return std::make_shared<HardGame>(*this);
 // }
 

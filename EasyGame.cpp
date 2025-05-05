@@ -25,7 +25,6 @@ void EasyGame::setupRound()
     gameOver = false;
     gameWon = false;
     player.setScore(0);
-    minefield.setFieldSize(9, 9, 10);
     minefield.setFirstMove();
 
     std::cout << "Enter your nickname: " << std::endl;
@@ -34,7 +33,9 @@ void EasyGame::setupRound()
     player.setNickname(newNickname);
 
     std::cout << "Welcome to MineMaster, " << player.getNickname() << "!" << std::endl;
-    std::cout << "Easy mode: 9x9 board with 10 mines." << std::endl;
+
+    std::cout << "Easy mode: 9x9 board with 10 mines" << std::endl;
+    minefield.setFieldSize(9, 9, 10);
 }
 
 void EasyGame::play() {
@@ -83,8 +84,8 @@ void EasyGame::play() {
             std::cout << "\nThis round has expired!" << std::endl;
         }
 
-        displayRemainingTime();
-        std::cout << "\n" << *this << std::endl;
+        // displayRemainingTime();
+        std::cout << *this << std::endl;
 
         if (timeExpired)
             return;
@@ -97,6 +98,11 @@ void EasyGame::play() {
     }
 }
 
-// std::unique_ptr<Game> EasyGame::clone() const {
-//     return std::make_unique<EasyGame>(*this);
+void EasyGame::displayMode(std::ostream& os) const
+{
+    os << "Easy" << std::endl;
+}
+
+// std::shared_ptr<Game> EasyGame::clone() const {
+//     return std::make_shared<EasyGame>(*this);
 // }

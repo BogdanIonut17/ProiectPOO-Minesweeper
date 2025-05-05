@@ -8,17 +8,22 @@
 #include <memory>
 #include "Game.h"
 
-class GameController {
+class GameController
+{
 private:
-    std::unique_ptr<Game> gameMode;
+    std::shared_ptr<Game> gameMode;
 
 public:
-    explicit GameController(std::unique_ptr<Game> mode);
+    explicit GameController(std::shared_ptr<Game> mode);
+
+    GameController(const GameController& other);
+
+    GameController& operator=(GameController other);
+
+    friend void swap(GameController& lhs, GameController& rhs) noexcept;
 
     void run() const;
 };
-
-
 
 
 #endif //GAMECONTROLLER_H

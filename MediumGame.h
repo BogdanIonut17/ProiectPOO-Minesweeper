@@ -19,7 +19,9 @@ public:
 
     void play() override;
 
-    // [[nodiscard]] std::unique_ptr<Game> clone() const override;
+    void displayMode(std::ostream&) const override;
+
+    // [[nodiscard]] std::shared_ptr<Game> clone() const override;
 };
 
 
