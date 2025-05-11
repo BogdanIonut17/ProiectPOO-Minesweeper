@@ -61,10 +61,10 @@ bool Game::isGameOver()
     return true;
 }
 
-bool Game::isValidConfiguration(const int rows, const int cols, const int mineCount)
-{
-    return rows > 0 && cols > 0 && mineCount > 0 && mineCount < rows * cols;
-}
+// bool Game::isValidConfiguration(const int rows, const int cols, const int mineCount)
+// {
+//     return rows > 0 && cols > 0 && mineCount > 0 && mineCount < rows * cols;
+// }
 
 void Game::setTimeout(const std::function<void()>& func, std::chrono::milliseconds delay)
 {
@@ -80,7 +80,7 @@ void Game::displayRemainingTime() const
     const int minutes = roundTimeLeftSeconds.load() / 60;
     const int seconds = roundTimeLeftSeconds.load() % 60;
 
-    std::cout << "Time left: " << minutes << ":" << (seconds < 10 ? "0" : "") << seconds << "   "<< std::endl;
+    std::cout << "Time left: " << minutes << ":" << (seconds < 10 ? "0" : "") << seconds << "   " << std::endl;
 }
 
 // Game::Game(const Minefield& minefield, const Player& player, const std::chrono::milliseconds time,
@@ -98,7 +98,8 @@ Game::Game(const Minefield& minefield, const Player& player,
                                                  startTime(std::chrono::steady_clock::now()),
                                                  roundDuration(duration),
                                                  timeExpired(false), firstGame(true)
-{}
+{
+}
 
 Game::Game(const Game& other): minefield(other.minefield),
                                player(other.player),
@@ -268,14 +269,12 @@ void Game::play()
     //     if (timeExpired)
     //         return;
 
-        // char choice;
-        // std::cout << "Play again? (y/n): " << std::endl;
-        // std::cin >> choice;
-        // if (std::toupper(choice) != 'Y')
-        //     break;
+    // char choice;
+    // std::cout << "Play again? (y/n): " << std::endl;
+    // std::cin >> choice;
+    // if (std::toupper(choice) != 'Y')
+    //     break;
     // }
-
-
 }
 
 

@@ -41,7 +41,8 @@ void GameController::showMenu()
 
 std::shared_ptr<Game> GameController::createGame(const char choice)
 {
-    switch (choice) {
+    switch (choice)
+    {
     case '0':
         {
             std::cout << "\nGoodbye!\n";
@@ -71,11 +72,6 @@ std::shared_ptr<Game> GameController::createGame(const char choice)
     }
 }
 
-std::shared_ptr<Game> GameController::getGameMode() const
-{
-    return gameMode;
-}
-
 void GameController::setGameMode(const std::shared_ptr<Game>& game)
 {
     gameMode = game;
@@ -89,7 +85,6 @@ void GameController::run()
 
     if (firstGame)
     {
-
         showMenu();
         char choice;
         std::cin >> choice;
@@ -146,7 +141,7 @@ void GameController::run()
             setGameMode(newGame);
         }
         else return;
-        }
+    }
 }
 
 void swap(GameController& lhs, GameController& rhs) noexcept

@@ -8,7 +8,9 @@
 
 // EasyGame::EasyGame() : Game(Minefield(9, 9, 10), Player("Player1"), std::chrono::minutes(10), std::chrono::minutes(3)) {}
 
-EasyGame::EasyGame() : Game(Minefield(9, 9, 10), Player("Player1"), std::chrono::minutes(3)) {}
+EasyGame::EasyGame() : Game(Minefield(9, 9, 10), Player("Player1"), std::chrono::minutes(3))
+{
+}
 
 
 EasyGame::EasyGame(const EasyGame& other): Game(other)
@@ -108,6 +110,7 @@ void EasyGame::displayMode(std::ostream& os) const
     os << "Easy" << std::endl;
 }
 
-std::shared_ptr<Game> EasyGame::clone() const {
+std::shared_ptr<Game> EasyGame::clone() const
+{
     return std::make_shared<EasyGame>(*this);
 }

@@ -31,7 +31,7 @@ protected:
 
     bool isGameOver();
 
-    [[nodiscard]] static bool isValidConfiguration(int rows, int cols, int mineCount);
+    // [[nodiscard]] static bool isValidConfiguration(int rows, int cols, int mineCount);
 
     virtual void setupRound();
 
@@ -51,7 +51,6 @@ public:
     virtual ~Game() = default;
 
     friend std::ostream& operator<<(std::ostream& os, const Game& game);
-
 
 
     void setGameOver();
