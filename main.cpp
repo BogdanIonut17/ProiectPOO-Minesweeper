@@ -11,28 +11,32 @@
 
 int main()
 {
-    int choice;
-    std::cout << "Choose gamemode: \n1. Easy \n2. Medium \n3. Hard" << std::endl;
-    std::cin >> choice;
-
-    std::shared_ptr<Game> mode;
-
-    switch (choice)
-    {
-    case 1: mode = std::make_shared<EasyGame>();
-        break;
-    case 2: mode = std::make_shared<MediumGame>();
-        break;
-    case 3: mode = std::make_shared<HardGame>();
-        break;
-    default:
-        std::cout << "Invalid choice. Defaulting to Easy.\n";
-        mode = std::make_shared<EasyGame>();
-        break;
-    }
-
-    const GameController controller(std::move(mode));
+    GameController controller;
     controller.run();
+
+    // int choice;
+    // std::cout << "Choose gamemode: \n1. Easy \n2. Medium \n3. Hard" << std::endl;
+    // std::cin >> choice;
+    //
+    // std::shared_ptr<Game> mode;
+    //
+    // switch (choice)
+    // {
+    // case 1: mode = std::make_shared<EasyGame>();
+    //     break;
+    // case 2: mode = std::make_shared<MediumGame>();
+    //     break;
+    // case 3: mode = std::make_shared<HardGame>();
+    //     break;
+    // default:
+    //     std::cout << "Invalid choice. Defaulting to Easy.\n";
+    //     mode = std::make_shared<EasyGame>();
+    //     break;
+    // }
+
+    // const GameController controller(std::move(mode));
+    // controller.run();
+
 
     // EasyGame game(minefield, player, std::chrono::minutes(10), std::chrono::minutes(3));
     // game.play();

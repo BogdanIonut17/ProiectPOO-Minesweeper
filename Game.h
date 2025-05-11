@@ -27,8 +27,6 @@ protected:
     std::atomic<bool> timeExpired;
     bool firstGame;
 
-    void setGameOver();
-
     void endGame();
 
     bool isGameOver();
@@ -37,12 +35,13 @@ protected:
 
     virtual void setupRound();
 
-    static void setTimeout(const std::function<void()>& func, std::chrono::milliseconds delay);
-
     void displayRemainingTime() const;
 
 public:
     Game(const Minefield& minefield, const Player& player, std::chrono::milliseconds time,
+         std::chrono::minutes duration);
+
+    Game(const Minefield& minefield, const Player& player,
          std::chrono::minutes duration);
 
     Game(const Game& other);
@@ -53,11 +52,17 @@ public:
 
     friend std::ostream& operator<<(std::ostream& os, const Game& game);
 
-    virtual void play();
+
+
+    void setGameOver();
+
+    static void setTimeout(const std::function<void()>& func, std::chrono::milliseconds delay);
+
+    void play();
 
     virtual void displayMode(std::ostream&) const;
 
-    // [[nodiscard]] virtual std::shared_ptr<Game> clone() const = 0;
+    [[nodiscard]] virtual std::shared_ptr<Game> clone() const = 0;
 
     // void displayStatus() const;
 };

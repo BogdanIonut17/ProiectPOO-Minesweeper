@@ -7,6 +7,8 @@
 #include <iostream>
 #include <thread>
 
+#include "GameController.h"
+
 void Game::setGameOver()
 {
     gameOver = true;
@@ -78,17 +80,25 @@ void Game::displayRemainingTime() const
     const int minutes = roundTimeLeftSeconds.load() / 60;
     const int seconds = roundTimeLeftSeconds.load() % 60;
 
-    std::cout << "Time left: " << minutes << ":" << (seconds < 10 ? "0" : "") << seconds << "   ";
+    std::cout << "Time left: " << minutes << ":" << (seconds < 10 ? "0" : "") << seconds << "   "<< std::endl;
 }
 
-Game::Game(const Minefield& minefield, const Player& player, const std::chrono::milliseconds time,
+// Game::Game(const Minefield& minefield, const Player& player, const std::chrono::milliseconds time,
+//            const std::chrono::minutes duration): minefield(minefield), player(player),
+//                                                  gameOver(false), gameWon(false),
+//                                                  startTime(std::chrono::steady_clock::now()),
+//                                                  totalTime(time), roundDuration(duration),
+//                                                  timeExpired(false), firstGame(true)
+// {
+// }
+
+Game::Game(const Minefield& minefield, const Player& player,
            const std::chrono::minutes duration): minefield(minefield), player(player),
                                                  gameOver(false), gameWon(false),
                                                  startTime(std::chrono::steady_clock::now()),
-                                                 totalTime(time), roundDuration(duration),
+                                                 roundDuration(duration),
                                                  timeExpired(false), firstGame(true)
-{
-}
+{}
 
 Game::Game(const Game& other): minefield(other.minefield),
                                player(other.player),
@@ -122,19 +132,19 @@ void Game::setupRound()
     player.setScore(0);
     minefield.setFirstMove();
 
-    int newRows = 0, newCols = 0, newMineCount = 0;
-    std::cout << "Enter board size (rows, cols) and number of mines: " << std::endl;
-    std::cin >> newRows >> newCols >> newMineCount;
-
-    if (!isValidConfiguration(newRows, newCols, newMineCount))
-    {
-        std::cout << "Invalid board configuration! Defaulting to 8x8 with 9 mines." << std::endl;
-        newRows = 8;
-        newCols = 8;
-        newMineCount = 9;
-    }
-
-    minefield.setFieldSize(newRows, newCols, newMineCount);
+    // int newRows = 0, newCols = 0, newMineCount = 0;
+    // std::cout << "Enter board size (rows, cols) and number of mines: " << std::endl;
+    // std::cin >> newRows >> newCols >> newMineCount;
+    //
+    // if (!isValidConfiguration(newRows, newCols, newMineCount))
+    // {
+    //     std::cout << "Invalid board configuration! Defaulting to 8x8 with 9 mines." << std::endl;
+    //     newRows = 8;
+    //     newCols = 8;
+    //     newMineCount = 9;
+    // }
+    //
+    // minefield.setFieldSize(newRows, newCols, newMineCount);
 
     std::cout << "Enter your nickname: " << std::endl;
     std::string newNickname;
@@ -143,82 +153,131 @@ void Game::setupRound()
 
     std::cout << "Welcome to MineMaster, " << player.getNickname() << "!" << std::endl;
 
-    if (firstGame)
-    {
-        setTimeout([this]
-        {
-            if (!gameOver)
-            {
-                std::cout << "\nTime's up! Game over!\n";
-                timeExpired = true;
-                setGameOver();
-            }
-            std::exit(0);
-        }, totalTime);
-        firstGame = false;
-    }
+    // if (firstGame)
+    // {
+    //     setTimeout([this]
+    //     {
+    //         if (!gameOver)
+    //         {
+    //             std::cout << "\nTime's up! Game over!\n";
+    //             timeExpired = true;
+    //             setGameOver();
+    //         }
+    //         std::exit(0);
+    //     }, totalTime);
+    //     firstGame = false;
+    // }
 }
 
 void Game::play()
 {
-    while (!timeExpired)
+    setupRound();
+
+    startTime = std::chrono::steady_clock::now();
+    roundTimeLeftSeconds = static_cast<int>(roundDuration.count());
+    std::atomic roundExpired = false;
+
+    std::thread roundTimer([this, &roundExpired]
     {
-        setupRound();
-
-        startTime = std::chrono::steady_clock::now();
-        roundTimeLeftSeconds = static_cast<int>(roundDuration.count());
-        std::atomic roundExpired = false;
-
-        std::thread roundTimer([this, &roundExpired]
+        while (!gameOver && roundTimeLeftSeconds > 0)
         {
-            while (!gameOver && roundTimeLeftSeconds > 0)
-            {
-                std::this_thread::sleep_for(std::chrono::seconds(1));
-                --roundTimeLeftSeconds;
-            }
-
-            if (!gameOver)
-            {
-                roundExpired = true;
-                setGameOver();
-            }
-        });
-
-        while (!gameOver && !timeExpired && !roundExpired)
-        {
-            displayRemainingTime();
-            std::cout << "\n" << minefield << std::endl;
-
-            minefield.processMove();
-
-            if (isGameOver())
-            {
-                endGame();
-                break;
-            }
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+            --roundTimeLeftSeconds;
         }
 
-        if (roundTimer.joinable())
-            roundTimer.detach();
-
-        if (roundExpired)
+        if (!gameOver)
         {
-            std::cout << "\nThis round has expired!" << std::endl;
+            roundExpired = true;
+            setGameOver();
         }
+    });
 
-        // displayRemainingTime();
-        std::cout << *this << std::endl;
+    while (!gameOver && !timeExpired && !roundExpired)
+    {
+        displayRemainingTime();
+        std::cout << "\n" << minefield << std::endl;
 
-        if (timeExpired)
-            return;
+        minefield.processMove();
 
-        char choice;
-        std::cout << "Play again? (y/n): " << std::endl;
-        std::cin >> choice;
-        if (std::toupper(choice) != 'Y')
+        if (isGameOver())
+        {
+            endGame();
             break;
+        }
     }
+
+    if (roundTimer.joinable())
+        roundTimer.detach();
+
+    if (roundExpired && !gameOver)
+    {
+        std::cout << "\nThis round has expired!" << std::endl;
+    }
+
+    displayRemainingTime();
+    std::cout << *this << std::endl;
+
+    // while (!timeExpired)
+    // {
+    //     setupRound();
+    //
+    //     startTime = std::chrono::steady_clock::now();
+    //     roundTimeLeftSeconds = static_cast<int>(roundDuration.count());
+    //     std::atomic roundExpired = false;
+    //
+    //     std::thread roundTimer([this, &roundExpired]
+    //     {
+    //         while (!gameOver && roundTimeLeftSeconds > 0)
+    //         {
+    //             std::this_thread::sleep_for(std::chrono::seconds(1));
+    //             --roundTimeLeftSeconds;
+    //         }
+    //
+    //         if (!gameOver)
+    //         {
+    //             roundExpired = true;
+    //             setGameOver();
+    //         }
+    //     });
+    //
+    //     while (!gameOver && !timeExpired && !roundExpired)
+    //     {
+    //         displayRemainingTime();
+    //         std::cout << "\n" << minefield << std::endl;
+    //
+    //         minefield.processMove();
+    //
+    //         if (isGameOver())
+    //         {
+    //             endGame();
+    //             break;
+    //         }
+    //     }
+    //
+    //     if (roundTimer.joinable())
+    //         roundTimer.detach();
+    //
+    //     if (roundExpired)
+    //     {
+    //         std::cout << "\nThis round has expired!" << std::endl;
+    //     }
+    //
+    //     // displayRemainingTime();
+    //     std::cout << *this << std::endl;
+    //
+    //     if (timeExpired)
+    //         return;
+
+        // char choice;
+        // std::cout << "Play again? (y/n): " << std::endl;
+        // std::cin >> choice;
+        // if (std::toupper(choice) != 'Y')
+        //     break;
+    // }
+
+
 }
+
 
 void Game::displayMode(std::ostream&) const
 {

@@ -6,14 +6,18 @@
 #define GAMECONTROLLER_H
 
 #include <memory>
+
 #include "Game.h"
 
 class GameController
 {
 private:
     std::shared_ptr<Game> gameMode;
+    static bool firstGame;
 
 public:
+    GameController();
+
     explicit GameController(std::shared_ptr<Game> mode);
 
     GameController(const GameController& other);
@@ -22,7 +26,15 @@ public:
 
     friend void swap(GameController& lhs, GameController& rhs) noexcept;
 
-    void run() const;
+    static void showMenu() ;
+
+    std::shared_ptr<Game> createGame(char choice);
+
+    [[nodiscard]] std::shared_ptr<Game> getGameMode() const;
+
+    void setGameMode(const std::shared_ptr<Game>& game);
+
+    void run();
 };
 
 

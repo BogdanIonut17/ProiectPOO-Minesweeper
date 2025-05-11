@@ -18,11 +18,11 @@ public:
 
     void setupRound() override;
 
-    void play() override;
+    // void play() override;
 
     void displayMode(std::ostream&) const override;
 
-    // [[nodiscard]] std::shared_ptr<Game> clone() const override;
+    [[nodiscard]] std::shared_ptr<Game> clone() const override;
 };
 
 
