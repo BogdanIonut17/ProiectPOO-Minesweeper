@@ -83,21 +83,11 @@ void Game::displayRemainingTime() const
     std::cout << "Time left: " << minutes << ":" << (seconds < 10 ? "0" : "") << seconds << "   " << std::endl;
 }
 
-// Game::Game(const Minefield& minefield, const Player& player, const std::chrono::milliseconds time,
-//            const std::chrono::minutes duration): minefield(minefield), player(player),
-//                                                  gameOver(false), gameWon(false),
-//                                                  startTime(std::chrono::steady_clock::now()),
-//                                                  totalTime(time), roundDuration(duration),
-//                                                  timeExpired(false), firstGame(true)
-// {
-// }
-
 Game::Game(const Minefield& minefield, const Player& player,
            const std::chrono::minutes duration): minefield(minefield), player(player),
                                                  gameOver(false), gameWon(false),
                                                  startTime(std::chrono::steady_clock::now()),
-                                                 roundDuration(duration),
-                                                 timeExpired(false), firstGame(true)
+                                                 roundDuration(duration)
 {
 }
 
@@ -106,9 +96,7 @@ Game::Game(const Game& other): minefield(other.minefield),
                                gameOver(other.gameOver),
                                gameWon(other.gameWon),
                                startTime(other.startTime),
-                               totalTime(other.totalTime),
-                               roundDuration(other.roundDuration),
-                               firstGame(other.firstGame)
+                               roundDuration(other.roundDuration)
 {
 }
 
@@ -121,8 +109,6 @@ Game& Game::operator=(const Game& other)
     gameOver = other.gameOver;
     gameWon = other.gameWon;
     startTime = other.startTime;
-    totalTime = other.totalTime;
-    firstGame = other.firstGame;
     return *this;
 }
 
@@ -172,6 +158,7 @@ void Game::setupRound()
 
 void Game::play()
 {
+    Game::setupRound();
     setupRound();
 
     startTime = std::chrono::steady_clock::now();
@@ -193,7 +180,7 @@ void Game::play()
         }
     });
 
-    while (!gameOver && !timeExpired && !roundExpired)
+    while (!gameOver && !roundExpired)
     {
         displayRemainingTime();
         std::cout << "\n" << minefield << std::endl;

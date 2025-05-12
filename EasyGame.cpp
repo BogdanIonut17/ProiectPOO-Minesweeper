@@ -6,8 +6,6 @@
 #include <iostream>
 #include <thread>
 
-// EasyGame::EasyGame() : Game(Minefield(9, 9, 10), Player("Player1"), std::chrono::minutes(10), std::chrono::minutes(3)) {}
-
 EasyGame::EasyGame() : Game(Minefield(9, 9, 10), Player("Player1"), std::chrono::minutes(3))
 {
 }
@@ -38,8 +36,6 @@ void EasyGame::setupRound()
     // player.setNickname(newNickname);
     //
     // std::cout << "Welcome to MineMaster, " << player.getNickname() << "!" << std::endl;
-
-    Game::setupRound();
 
     std::cout << "Easy mode: 9x9 board with 10 mines" << std::endl;
     minefield.setFieldSize(9, 9, 10);

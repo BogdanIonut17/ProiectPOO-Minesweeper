@@ -1,12 +1,6 @@
 // #include <SFML/Graphics.hpp>
 
-#include <iostream>
-
-#include "Game.h"
-#include "EasyGame.h"
 #include "GameController.h"
-#include "MediumGame.h"
-#include "HardGame.h"
 
 
 int main()

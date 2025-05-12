@@ -20,6 +20,7 @@ GameController::GameController(std::shared_ptr<Game> mode) : gameMode(std::move(
 
 GameController::GameController(const GameController& other): gameMode(other.gameMode)
 {
+    firstGame = true;
 }
 
 GameController& GameController::operator=(GameController other)
@@ -58,15 +59,12 @@ std::shared_ptr<Game> GameController::createGame(const char choice)
                 setGameMode(gameMode->clone());
                 return gameMode;
             }
-            else
-            {
-                std::cout << "\nThis is the first game. Choose a difficulty (1, 2, 3) or type 0 to exit:\n";
-                showMenu();
-                char newChoice;
-                std::cin >> newChoice;
-                auto game = createGame(newChoice);
-                return game;
-            }
+            std::cout << "\nThis is the first game. Choose a difficulty (1, 2, 3) or type 0 to exit:\n";
+            showMenu();
+            char newChoice;
+            std::cin >> newChoice;
+            auto game = createGame(newChoice);
+            return game;
         }
     default: return std::make_shared<EasyGame>();
     }
@@ -89,15 +87,6 @@ void GameController::run()
         char choice;
         std::cin >> choice;
 
-        // if (choice == '4')
-        // {
-        //     std::cout << "\nThis is the first game. Choose a difficulty (1, 2, 3) or type 0 to exit:\n";
-        //     showMenu();
-        //     char newChoice;
-        //     std::cin >> newChoice;
-        //     choice = newChoice;
-        //     firstGame = false;
-        // }
         auto game = createGame(choice);
         firstGame = false;
 
@@ -113,7 +102,7 @@ void GameController::run()
             {
                 std::cout << "\nTime's up! Game over!\n";
                 globalTimeExpired = true;
-                gameMode->setGameOver();
+                std::cout << *gameMode << std::endl;
                 std::exit(0);
             }
         }, totalTime);
@@ -122,9 +111,6 @@ void GameController::run()
     while (!globalTimeExpired)
     {
         gameMode->play();
-
-        if (globalTimeExpired)
-            return;
 
         showMenu();
         char choice;
@@ -148,4 +134,6 @@ void swap(GameController& lhs, GameController& rhs) noexcept
 {
     using std::swap;
     swap(lhs.gameMode, rhs.gameMode);
+    GameController::firstGame = true;
 }
+
