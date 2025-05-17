@@ -1,7 +1,3 @@
-//
-// Created by Windows on 05.05.2025.
-//
-
 #include "GameController.h"
 
 #include <iostream>
@@ -10,7 +6,7 @@
 #include "HardGame.h"
 #include "MediumGame.h"
 
-bool GameController::firstGame = true;
+bool GameController::firstRound = true;
 
 GameController::GameController() = default;
 
@@ -20,7 +16,7 @@ GameController::GameController(std::shared_ptr<Game> mode) : gameMode(std::move(
 
 GameController::GameController(const GameController& other): gameMode(other.gameMode)
 {
-    firstGame = true;
+    firstRound = true;
 }
 
 GameController& GameController::operator=(GameController other)
@@ -31,11 +27,12 @@ GameController& GameController::operator=(GameController other)
 
 void GameController::showMenu()
 {
-    std::cout << "\nChoose an option:\n";
+    std::cout << "\nSelect an option:\n";
     std::cout << "1. Easy\n";
     std::cout << "2. Medium\n";
     std::cout << "3. Hard\n";
-    std::cout << "4. Keep previous difficulty\n";
+    std::cout << "4. Keep previous difficulty\n";\
+    std::cout << "5. Replay last round\n";
     std::cout << "0. Exit\n";
     std::cout << "Enter choice:\n ";
 }
@@ -54,12 +51,26 @@ std::shared_ptr<Game> GameController::createGame(const char choice)
     case '3': return std::make_shared<HardGame>();
     case '4':
         {
-            if (gameMode && !firstGame)
+            if (gameMode && !firstRound)
             {
                 setGameMode(gameMode->clone());
+                gameMode->resetGameOver();
                 return gameMode;
             }
-            std::cout << "\nThis is the first game. Choose a difficulty (1, 2, 3) or type 0 to exit:\n";
+            std::cout << "\nThis is your first round. Choose a difficulty (1, 2, 3) or type 0 to exit:\n";
+            showMenu();
+            char newChoice;
+            std::cin >> newChoice;
+            auto game = createGame(newChoice);
+            return game;
+        }
+    case '5':
+        {
+            if (gameMode && !firstRound)
+            {
+                return gameMode;
+            }
+            std::cout << "\nThis is your first round. Choose a difficulty (1, 2, 3) or type 0 to exit:\n";
             showMenu();
             char newChoice;
             std::cin >> newChoice;
@@ -77,18 +88,17 @@ void GameController::setGameMode(const std::shared_ptr<Game>& game)
 
 void GameController::run()
 {
-    static std::atomic globalTimeExpired = false;
-    // static bool firstGame = true;
-    static auto totalTime = std::chrono::minutes(10);
+    static std::atomic timeExpired = false;
+    static auto totalTime = std::chrono::minutes(1);
 
-    if (firstGame)
+    if (firstRound)
     {
         showMenu();
         char choice;
         std::cin >> choice;
 
-        auto game = createGame(choice);
-        firstGame = false;
+        const auto game = createGame(choice);
+        firstRound = false;
 
         if (game)
         {
@@ -98,17 +108,18 @@ void GameController::run()
 
         Game::setTimeout([this]
         {
-            if (!globalTimeExpired)
+            std::cout << "\nTime's up! Goodbye!\n";
+            timeExpired = true;
+            if (!gameMode->isGameOver())
             {
-                std::cout << "\nTime's up! Game over!\n";
-                globalTimeExpired = true;
+                std::cout <<"Game over!\n";
                 std::cout << *gameMode << std::endl;
-                std::exit(0);
             }
+            std::exit(0);
         }, totalTime);
     }
 
-    while (!globalTimeExpired)
+    while (!timeExpired)
     {
         gameMode->play();
 
@@ -116,11 +127,6 @@ void GameController::run()
         char choice;
         std::cin >> choice;
 
-        // if (choice == '4')
-        // {
-        //     setGameMode(gameMode->clone());
-        // }
-        // else
         auto newGame = createGame(choice);
         if (newGame)
         {
@@ -134,6 +140,6 @@ void swap(GameController& lhs, GameController& rhs) noexcept
 {
     using std::swap;
     swap(lhs.gameMode, rhs.gameMode);
-    GameController::firstGame = true;
+    GameController::firstRound = true;
 }
 

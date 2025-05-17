@@ -1,9 +1,6 @@
-//
-// Created by Windows on 12.04.2025.
-//
-
 #ifndef MINEFIELD_H
 #define MINEFIELD_H
+
 #include <vector>
 
 
@@ -13,7 +10,6 @@
 
 class Minefield
 {
-private:
     int rows, cols, mineCount;
     std::vector<std::vector<Cell>> grid;
     bool firstMove;
@@ -37,8 +33,6 @@ public:
 
     [[nodiscard]] int getCols() const;
 
-    Cell& getCell(int x, int y);
-
     [[nodiscard]] const Cell& getCell(int x, int y) const;
 
     void setFirstMove();
@@ -48,6 +42,8 @@ public:
     void shuffleMines();
 
     void setFieldSize(int newRows, int newCols, int newMineCount);
+
+    void resetField();
 
     void flagCell(int x, int y);
 

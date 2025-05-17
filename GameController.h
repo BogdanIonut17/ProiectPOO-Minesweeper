@@ -1,7 +1,3 @@
-//
-// Created by Windows on 05.05.2025.
-//
-
 #ifndef GAMECONTROLLER_H
 #define GAMECONTROLLER_H
 
@@ -12,7 +8,7 @@
 class GameController
 {
     std::shared_ptr<Game> gameMode;
-    static bool firstGame;
+    static bool firstRound;
 
 public:
     GameController();

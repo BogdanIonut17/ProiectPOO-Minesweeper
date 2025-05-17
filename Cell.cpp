@@ -1,7 +1,3 @@
-//
-// Created by Windows on 12.04.2025.
-//
-
 #include <iostream>
 #include "Cell.h"
 
@@ -47,6 +43,11 @@ bool Cell::checkIfFlagged() const
 void Cell::reveal()
 {
     isRevealed = true;
+}
+
+void Cell::cover()
+{
+    isRevealed = false;
 }
 
 void Cell::toggleFlag()

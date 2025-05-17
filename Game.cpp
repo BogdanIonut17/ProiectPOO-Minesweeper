@@ -1,7 +1,3 @@
-//
-// Created by Windows on 12.04.2025.
-//
-
 #include "Game.h"
 
 #include <iostream>
@@ -9,9 +5,9 @@
 
 #include "GameController.h"
 
-void Game::setGameOver()
+void Game::resetGameOver()
 {
-    gameOver = true;
+    gameOver = false;
 }
 
 void Game::endGame()
@@ -29,10 +25,11 @@ void Game::endGame()
 
         const int playerScore = std::max(0, static_cast<int>(gameTimeLeft.count()));
         player.setScore(playerScore);
+        updateHighScore();
 
         std::cout << "\nYou won!" << std::endl;
     }
-    setGameOver();
+    gameOver = true;
 }
 
 bool Game::isGameOver()
@@ -112,6 +109,16 @@ Game& Game::operator=(const Game& other)
     return *this;
 }
 
+[[nodiscard]] int Game::getScore() const
+{
+    return player.getScore();
+}
+
+void Game::setHighScore(const int score)
+{
+    player.setScore(score);
+}
+
 void Game::setupRound()
 {
     gameOver = false;
@@ -140,7 +147,7 @@ void Game::setupRound()
 
     std::cout << "Welcome to MineMaster, " << player.getNickname() << "!" << std::endl;
 
-    // if (firstGame)
+    // if (firstRound)
     // {
     //     setTimeout([this]
     //     {
@@ -152,14 +159,24 @@ void Game::setupRound()
     //         }
     //         std::exit(0);
     //     }, totalTime);
-    //     firstGame = false;
+    //     firstRound = false;
     // }
 }
 
 void Game::play()
 {
-    Game::setupRound();
-    setupRound();
+    if (gameOver)
+    {
+        minefield.resetField();
+        gameOver = false;
+        gameWon = false;
+        player.setScore(0);
+    }
+    else
+    {
+        Game::setupRound();
+        setupRound();
+    }
 
     startTime = std::chrono::steady_clock::now();
     roundTimeLeftSeconds = static_cast<int>(roundDuration.count());
@@ -176,7 +193,7 @@ void Game::play()
         if (!gameOver)
         {
             roundExpired = true;
-            setGameOver();
+            gameOver = true;
         }
     });
 
@@ -205,69 +222,14 @@ void Game::play()
     displayRemainingTime();
     std::cout << *this << std::endl;
 
-    // while (!timeExpired)
-    // {
-    //     setupRound();
-    //
-    //     startTime = std::chrono::steady_clock::now();
-    //     roundTimeLeftSeconds = static_cast<int>(roundDuration.count());
-    //     std::atomic roundExpired = false;
-    //
-    //     std::thread roundTimer([this, &roundExpired]
-    //     {
-    //         while (!gameOver && roundTimeLeftSeconds > 0)
-    //         {
-    //             std::this_thread::sleep_for(std::chrono::seconds(1));
-    //             --roundTimeLeftSeconds;
-    //         }
-    //
-    //         if (!gameOver)
-    //         {
-    //             roundExpired = true;
-    //             setGameOver();
-    //         }
-    //     });
-    //
-    //     while (!gameOver && !timeExpired && !roundExpired)
-    //     {
-    //         displayRemainingTime();
-    //         std::cout << "\n" << minefield << std::endl;
-    //
-    //         minefield.processMove();
-    //
-    //         if (isGameOver())
-    //         {
-    //             endGame();
-    //             break;
-    //         }
-    //     }
-    //
-    //     if (roundTimer.joinable())
-    //         roundTimer.detach();
-    //
-    //     if (roundExpired)
-    //     {
-    //         std::cout << "\nThis round has expired!" << std::endl;
-    //     }
-    //
-    //     // displayRemainingTime();
-    //     std::cout << *this << std::endl;
-    //
-    //     if (timeExpired)
-    //         return;
 
-    // char choice;
-    // std::cout << "Play again? (y/n): " << std::endl;
-    // std::cin >> choice;
-    // if (std::toupper(choice) != 'Y')
-    //     break;
-    // }
 }
 
-
-void Game::displayMode(std::ostream&) const
+Minefield& Game::getMinefield()
 {
+    return minefield;
 }
+
 
 std::ostream& operator<<(std::ostream& os, const Game& game)
 {
@@ -277,7 +239,8 @@ std::ostream& operator<<(std::ostream& os, const Game& game)
     }
     os << "\nDifficulty: ";
     game.displayMode(os);
-    os << game.player << std::endl;
+    os << game.player;
+    os << "Highscore: " << game.getHighScore() << std::endl;
     os << game.minefield << std::endl;
     return os;
 }

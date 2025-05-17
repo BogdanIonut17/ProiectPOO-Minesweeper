@@ -1,7 +1,3 @@
-//
-// Created by Windows on 12.04.2025.
-//
-
 #include "Minefield.h"
 #include "Cell.h"
 
@@ -168,9 +164,6 @@ int Minefield::getRows() const
 int Minefield::getCols() const
 { return cols; }
 
-Cell& Minefield::getCell(const int x, const int y)
-{ return grid[x][y]; }
-
 const Cell& Minefield::getCell(const int x, const int y) const
 { return grid[x][y]; }
 
@@ -259,6 +252,19 @@ void Minefield::setFieldSize(const int newRows, const int newCols, const int new
     grid = std::vector(rows, std::vector<Cell>(cols));
 }
 
+void Minefield::resetField() {
+    firstMove = false;
+    for (auto& row : grid) {
+        for (auto& cell : row) {
+            cell.cover();
+            if (cell.checkIfFlagged()) {
+                cell.toggleFlag();
+            }
+        }
+    }
+}
+
+
 void Minefield::flagCell(const int x, const int y)
 {
     if (!grid[x][y].checkIfRevealed())
@@ -305,7 +311,7 @@ void Minefield::processMove()
 
 std::ostream& operator<<(std::ostream& os, const Minefield& minefield)
 {
-    os << "Minefield: " << std::endl;
+    os << "\nMinefield: " << std::endl;
     os << "   ";
     for (int j = 0; j < minefield.cols; j++)
     {

@@ -1,7 +1,3 @@
-//
-// Created by Windows on 28.04.2025.
-//
-
 #ifndef EASYGAME_H
 #define EASYGAME_H
 
@@ -11,16 +7,15 @@
 #include "Game.h"
 
 class EasyGame : public Game{
+    static int easyHighScore;
 public:
     EasyGame();
 
-    EasyGame(const EasyGame& other);
+    [[nodiscard]] int getHighScore() const override ;
 
-    EasyGame& operator=(const EasyGame& other);
+    void updateHighScore() override;
 
     void setupRound() override;
-
-    // void play() override;
 
     void displayMode(std::ostream& os) const override;
 

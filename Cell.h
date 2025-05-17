@@ -1,7 +1,3 @@
-//
-// Created by Windows on 12.04.2025.
-//
-
 #ifndef CELL_H
 #define CELL_H
 
@@ -9,7 +5,6 @@
 
 class Cell
 {
-private:
     bool hasMine;
     bool isRevealed;
     bool isFlagged;
@@ -30,6 +25,8 @@ public:
     [[nodiscard]] bool checkIfFlagged() const;
 
     void reveal();
+
+    void cover();
 
     void toggleFlag();
 
