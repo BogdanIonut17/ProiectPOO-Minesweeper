@@ -112,7 +112,7 @@ void GameController::run()
             timeExpired = true;
             if (!gameMode->isGameOver())
             {
-                std::cout <<"Game over!\n";
+                std::cout << "Game over!\n";
                 std::cout << *gameMode << std::endl;
             }
             std::exit(0);

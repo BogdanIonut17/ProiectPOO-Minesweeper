@@ -5,6 +5,7 @@
 
 class MediumGame : public Game{
     static int mediumHighScore;
+
 public:
     MediumGame();
 

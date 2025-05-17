@@ -30,11 +30,13 @@ protected:
 
     [[nodiscard]] int getScore() const;
 
-    void setHighScore(int score);
+    // void setHighScore(int score);
 
     [[nodiscard]] virtual int getHighScore() const = 0;
 
-    virtual void updateHighScore(){}
+    virtual void updateHighScore()
+    {
+    }
 
     virtual void setupRound();
 

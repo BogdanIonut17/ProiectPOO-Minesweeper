@@ -8,10 +8,11 @@
 
 class EasyGame : public Game{
     static int easyHighScore;
+
 public:
     EasyGame();
 
-    [[nodiscard]] int getHighScore() const override ;
+    [[nodiscard]] int getHighScore() const override;
 
     void updateHighScore() override;
 

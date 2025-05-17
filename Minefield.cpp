@@ -252,12 +252,16 @@ void Minefield::setFieldSize(const int newRows, const int newCols, const int new
     grid = std::vector(rows, std::vector<Cell>(cols));
 }
 
-void Minefield::resetField() {
+void Minefield::resetField()
+{
     firstMove = false;
-    for (auto& row : grid) {
-        for (auto& cell : row) {
+    for (auto& row : grid)
+    {
+        for (auto& cell : row)
+        {
             cell.cover();
-            if (cell.checkIfFlagged()) {
+            if (cell.checkIfFlagged())
+            {
                 cell.toggleFlag();
             }
         }

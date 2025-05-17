@@ -6,6 +6,7 @@
 class HardGame : public Game
 {
     static int hardHighScore;
+
 public:
     HardGame();
 
