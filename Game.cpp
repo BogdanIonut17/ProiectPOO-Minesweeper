@@ -114,11 +114,6 @@ Game& Game::operator=(const Game& other)
     return player.getScore();
 }
 
-void Game::setHighScore(const int score)
-{
-    player.setScore(score);
-}
-
 void Game::setupRound()
 {
     gameOver = false;
