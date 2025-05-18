@@ -75,6 +75,8 @@ add_executable(${MAIN_EXECUTABLE_NAME}
         HardGame.h
         GameController.cpp
         GameController.h
+        CustomGame.cpp
+        CustomGame.h
 )
 
 # NOTE: Add all defined targets (e.g. executables, libraries, etc. )

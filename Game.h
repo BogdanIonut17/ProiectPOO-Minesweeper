@@ -17,24 +17,25 @@ class Game
     bool gameOver;
     bool gameWon;
     std::chrono::steady_clock::time_point startTime;
-    const std::chrono::seconds roundDuration;
+    std::chrono::seconds roundDuration;
     std::atomic<int> roundTimeLeftSeconds;
 
     void endGame();
 
-    // [[nodiscard]] static bool isValidConfiguration(int rows, int cols, int mineCount);
 protected:
     Game(const Game& other);
 
     Game& operator=(const Game& other);
 
-    [[nodiscard]] int getScore() const;
+    [[nodiscard]] int getPlayerScore() const;
 
     [[nodiscard]] virtual int getHighScore() const = 0;
 
-    virtual void updateHighScore()
-    {
-    }
+    virtual void updateHighScore() = 0;
+
+    [[nodiscard]] static bool isValidConfiguration(int rows, int cols, int mineCount);
+
+    void setRoundDuration(std::chrono::minutes customDuration);
 
     virtual void setupRound();
 

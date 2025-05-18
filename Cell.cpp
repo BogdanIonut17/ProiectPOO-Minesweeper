@@ -1,6 +1,7 @@
 #include <iostream>
 #include "Cell.h"
 
+
 Cell::Cell(const bool hasMine): hasMine(hasMine), isRevealed(false), isFlagged(false), adjacentMines(0)
 {
 }

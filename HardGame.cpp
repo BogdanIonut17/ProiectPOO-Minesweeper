@@ -2,6 +2,8 @@
 
 #include <iostream>
 #include <thread>
+
+
 int HardGame::hardHighScore = 0;
 
 HardGame::HardGame() : Game(Minefield(16, 30, 99), Player("Player1"), std::chrono::minutes(10))
@@ -15,8 +17,8 @@ int HardGame::getHighScore() const
 
 void HardGame::updateHighScore()
 {
-    if (getScore() > hardHighScore)
-        hardHighScore = getScore();
+    if (getPlayerScore() > hardHighScore)
+        hardHighScore = getPlayerScore();
 }
 
 void HardGame::setupRound()

@@ -1,6 +1,8 @@
 #include "EasyGame.h"
 #include <iostream>
 #include <thread>
+
+
 int EasyGame::easyHighScore = 0;
 
 EasyGame::EasyGame() : Game(Minefield(9, 9, 10), Player("Player1"), std::chrono::minutes(3))
@@ -14,8 +16,8 @@ int EasyGame::getHighScore() const
 
 void EasyGame::updateHighScore()
 {
-    if (getScore() > easyHighScore)
-        easyHighScore = getScore();
+    if (getPlayerScore() > easyHighScore)
+        easyHighScore = getPlayerScore();
 }
 
 void EasyGame::setupRound()

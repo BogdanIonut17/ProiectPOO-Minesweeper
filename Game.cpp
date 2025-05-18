@@ -58,10 +58,10 @@ bool Game::isGameOver()
     return true;
 }
 
-// bool Game::isValidConfiguration(const int rows, const int cols, const int mineCount)
-// {
-//     return rows > 0 && cols > 0 && mineCount > 0 && mineCount < rows * cols;
-// }
+bool Game::isValidConfiguration(const int rows, const int cols, const int mineCount)
+{
+    return rows > 0 && cols > 0 && mineCount > 0 && mineCount < rows * cols;
+}
 
 void Game::setTimeout(const std::function<void()>& func, std::chrono::milliseconds delay)
 {
@@ -109,9 +109,14 @@ Game& Game::operator=(const Game& other)
     return *this;
 }
 
-[[nodiscard]] int Game::getScore() const
+[[nodiscard]] int Game::getPlayerScore() const
 {
     return player.getScore();
+}
+
+void Game::setRoundDuration(const std::chrono::minutes customDuration)
+{
+    roundDuration = customDuration;
 }
 
 void Game::setupRound()
@@ -121,41 +126,12 @@ void Game::setupRound()
     player.setScore(0);
     minefield.setFirstMove();
 
-    // int newRows = 0, newCols = 0, newMineCount = 0;
-    // std::cout << "Enter board size (rows, cols) and number of mines: " << std::endl;
-    // std::cin >> newRows >> newCols >> newMineCount;
-    //
-    // if (!isValidConfiguration(newRows, newCols, newMineCount))
-    // {
-    //     std::cout << "Invalid board configuration! Defaulting to 8x8 with 9 mines." << std::endl;
-    //     newRows = 8;
-    //     newCols = 8;
-    //     newMineCount = 9;
-    // }
-    //
-    // minefield.setFieldSize(newRows, newCols, newMineCount);
-
     std::cout << "Enter your nickname: " << std::endl;
     std::string newNickname;
     std::cin >> newNickname;
     player.setNickname(newNickname);
 
     std::cout << "Welcome to MineMaster, " << player.getNickname() << "!" << std::endl;
-
-    // if (firstRound)
-    // {
-    //     setTimeout([this]
-    //     {
-    //         if (!gameOver)
-    //         {
-    //             std::cout << "\nTime's up! Game over!\n";
-    //             timeExpired = true;
-    //             setGameOver();
-    //         }
-    //         std::exit(0);
-    //     }, totalTime);
-    //     firstRound = false;
-    // }
 }
 
 void Game::play()
@@ -209,15 +185,13 @@ void Game::play()
     if (roundTimer.joinable())
         roundTimer.detach();
 
-    if (roundExpired && !gameOver)
+    if (roundExpired)
     {
         std::cout << "\nThis round has expired!" << std::endl;
     }
 
     displayRemainingTime();
     std::cout << *this << std::endl;
-
-
 }
 
 Minefield& Game::getMinefield()

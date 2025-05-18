@@ -2,6 +2,8 @@
 
 #include <iostream>
 #include <thread>
+
+
 int MediumGame::mediumHighScore = 0;
 
 MediumGame::MediumGame() : Game(Minefield(16, 16, 40), Player("Player1"), std::chrono::minutes(5))
@@ -15,8 +17,8 @@ int MediumGame::getHighScore() const
 
 void MediumGame::updateHighScore()
 {
-    if (getScore() > mediumHighScore)
-        mediumHighScore = getScore();
+    if (getPlayerScore() > mediumHighScore)
+        mediumHighScore = getPlayerScore();
 }
 
 void MediumGame::setupRound()

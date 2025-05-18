@@ -2,9 +2,11 @@
 
 #include <iostream>
 
+#include "CustomGame.h"
 #include "EasyGame.h"
 #include "HardGame.h"
 #include "MediumGame.h"
+
 
 bool GameController::firstRound = true;
 
@@ -31,8 +33,9 @@ void GameController::showMenu()
     std::cout << "1. Easy\n";
     std::cout << "2. Medium\n";
     std::cout << "3. Hard\n";
-    std::cout << "4. Keep previous difficulty\n";\
-    std::cout << "5. Replay last round\n";
+    std::cout << "4. Custom\n";
+    std::cout << "5. Keep previous difficulty\n";\
+    std::cout << "6. Replay last round\n";
     std::cout << "0. Exit\n";
     std::cout << "Enter choice:\n ";
 }
@@ -49,7 +52,8 @@ std::shared_ptr<Game> GameController::createGame(const char choice)
     case '1': return std::make_shared<EasyGame>();
     case '2': return std::make_shared<MediumGame>();
     case '3': return std::make_shared<HardGame>();
-    case '4':
+    case '4': return std::make_shared<CustomGame>();
+    case '5':
         {
             if (gameMode && !firstRound)
             {
@@ -64,12 +68,16 @@ std::shared_ptr<Game> GameController::createGame(const char choice)
             auto game = createGame(newChoice);
             return game;
         }
-    case '5':
+    case '6':
         {
             if (gameMode && !firstRound)
             {
+                auto customGame = std::dynamic_pointer_cast<CustomGame>(gameMode);
+                if (customGame)
+                    customGame->markReplay();
                 return gameMode;
             }
+
             std::cout << "\nThis is your first round. Choose a difficulty (1, 2, 3) or type 0 to exit:\n";
             showMenu();
             char newChoice;
@@ -89,7 +97,7 @@ void GameController::setGameMode(const std::shared_ptr<Game>& game)
 void GameController::run()
 {
     static std::atomic timeExpired = false;
-    static auto totalTime = std::chrono::minutes(1);
+    static auto totalTime = std::chrono::minutes(10);
 
     if (firstRound)
     {
