@@ -19,13 +19,14 @@ class CustomGame : public Game
 public:
     CustomGame();
 
+    void markReplay();
+
+private:
     [[nodiscard]] int getHighScore() const override;
 
     void updateHighScore() override;
 
-    void markReplay();
-
-    void setupRound() override;
+    void setupDifficultyRound() override;
 
     void displayMode(std::ostream& os) const override;
 

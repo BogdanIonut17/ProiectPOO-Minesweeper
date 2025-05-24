@@ -10,11 +10,12 @@ class HardGame : public Game
 public:
     HardGame();
 
+private:
     [[nodiscard]] int getHighScore() const override;
 
     void updateHighScore() override;
 
-    void setupRound() override;
+    void setupDifficultyRound() override;
 
     void displayMode(std::ostream&) const override;
 

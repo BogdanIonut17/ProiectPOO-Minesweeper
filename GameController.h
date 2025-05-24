@@ -10,6 +10,12 @@ class GameController
     std::shared_ptr<Game> gameMode;
     static bool firstRound;
 
+    static void showMenu();
+
+    std::shared_ptr<Game> createGame(int choice);
+
+    void setGameMode(const std::shared_ptr<Game>& game);
+
 public:
     GameController();
 
@@ -20,12 +26,6 @@ public:
     GameController& operator=(GameController other);
 
     friend void swap(GameController& lhs, GameController& rhs) noexcept;
-
-    static void showMenu();
-
-    std::shared_ptr<Game> createGame(int choice);
-
-    void setGameMode(const std::shared_ptr<Game>& game);
 
     void run();
 };

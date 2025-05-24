@@ -303,7 +303,8 @@ void Minefield::processMove()
     }
     // std::cin >> cellX >> cellY;
 
-    if (!(std::cin >> cellX >> cellY)) {
+    if (!(std::cin >> cellX >> cellY))
+    {
         throw InputReadError();
     }
 

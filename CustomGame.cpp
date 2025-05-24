@@ -31,7 +31,7 @@ void CustomGame::markReplay()
     isReplay = true;
 }
 
-void CustomGame::setupRound()
+void CustomGame::setupDifficultyRound()
 {
     if (isReplay)
     {
@@ -62,7 +62,8 @@ void CustomGame::setupRound()
     int minutes;
     std::cout << "Enter round duration in minutes: " << std::endl;
     // std::cin >> minutes;
-    if (!(std::cin >> minutes)) {
+    if (!(std::cin >> minutes))
+    {
         throw InputReadError();
     }
     if (minutes <= 0 || minutes > 59)

@@ -7,6 +7,7 @@ class Player
 {
     std::string nickname;
     int score;
+
 public:
     explicit Player(const std::string& nickname);
 

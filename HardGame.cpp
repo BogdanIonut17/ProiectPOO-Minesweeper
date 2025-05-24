@@ -21,7 +21,7 @@ void HardGame::updateHighScore()
         hardHighScore = getPlayerScore();
 }
 
-void HardGame::setupRound()
+void HardGame::setupDifficultyRound()
 {
     std::cout << "Hard mode: 16x30 board with 99 mines" << std::endl;
     getMinefield().setFieldSize(16, 30, 99);

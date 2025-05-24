@@ -20,7 +20,7 @@ void EasyGame::updateHighScore()
         easyHighScore = getPlayerScore();
 }
 
-void EasyGame::setupRound()
+void EasyGame::setupDifficultyRound()
 {
     std::cout << "Easy mode: 9x9 board with 10 mines" << std::endl;
     getMinefield().setFieldSize(9, 9, 10);

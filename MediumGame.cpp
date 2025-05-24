@@ -21,7 +21,7 @@ void MediumGame::updateHighScore()
         mediumHighScore = getPlayerScore();
 }
 
-void MediumGame::setupRound()
+void MediumGame::setupDifficultyRound()
 {
     std::cout << "Medium mode: 16x16 board with 40 mines" << std::endl;
     getMinefield().setFieldSize(16, 16, 40);

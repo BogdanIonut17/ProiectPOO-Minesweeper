@@ -17,6 +17,14 @@ int main()
     {
         std::cout << "\n[Game Error] " << err.what() << std::endl;
     }
+    catch (const std::exception& err)
+    {
+        std::cout << "\n[Error] " << err.what() << std::endl;
+    }
+    catch (...)
+    {
+        std::cout << "\n[Unknown Error]" << std::endl;
+    }
     return 0;
 
     // int choice;

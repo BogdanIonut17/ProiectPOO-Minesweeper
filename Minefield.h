@@ -22,9 +22,15 @@ class Minefield
 
     [[nodiscard]] int countFlags() const;
 
+    void revealCell(int cellX, int cellY);
+
     void BFSReveal(int startX, int startY);
 
     void chordReveal(int x, int y);
+
+    void flagCell(int x, int y);
+
+    void shuffleMines();
 
 public:
     Minefield(int rows, int cols, int mineCount);
@@ -37,15 +43,9 @@ public:
 
     void setFirstMove();
 
-    void revealCell(int cellX, int cellY);
-
-    void shuffleMines();
-
     void setFieldSize(int newRows, int newCols, int newMineCount);
 
     void resetField();
-
-    void flagCell(int x, int y);
 
     void processMove();
 

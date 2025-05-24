@@ -12,8 +12,11 @@ class Cell
 
 public:
     explicit Cell(bool hasMine = false);
+
     Cell(const Cell& other);
+
     Cell& operator=(const Cell& other);
+
     ~Cell();
 
     friend std::ostream& operator<<(std::ostream& os, const Cell& cell);

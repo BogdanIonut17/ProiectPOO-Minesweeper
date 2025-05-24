@@ -134,6 +134,8 @@ void Game::setupRound()
         player.setNickname(newNickname);
 
     std::cout << "Welcome to MineMaster, " << player.getNickname() << "!" << std::endl;
+
+    setupDifficultyRound();
 }
 
 void Game::play()
@@ -147,7 +149,6 @@ void Game::play()
     }
     else
     {
-        Game::setupRound();
         setupRound();
     }
 

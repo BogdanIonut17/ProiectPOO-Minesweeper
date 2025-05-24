@@ -105,7 +105,7 @@ void GameController::setGameMode(const std::shared_ptr<Game>& game)
 void GameController::run()
 {
     static std::atomic timeExpired = false;
-    static auto totalTime = std::chrono::minutes(8);
+    static auto totalTime = std::chrono::minutes(10);
 
     if (firstRound)
     {
@@ -161,4 +161,3 @@ void swap(GameController& lhs, GameController& rhs) noexcept
     swap(lhs.gameMode, rhs.gameMode);
     GameController::firstRound = true;
 }
-
