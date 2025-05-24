@@ -23,7 +23,7 @@ public:
 
     static void showMenu();
 
-    std::shared_ptr<Game> createGame(char choice);
+    std::shared_ptr<Game> createGame(int choice);
 
     void setGameMode(const std::shared_ptr<Game>& game);
 

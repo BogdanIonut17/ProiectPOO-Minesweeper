@@ -3,6 +3,7 @@
 //
 
 #include "CustomGame.h"
+#include "Exceptions.h"
 #include <iostream>
 
 
@@ -45,23 +46,30 @@ void CustomGame::setupRound()
 
     int newRows = 0, newCols = 0, newMineCount = 0;
     std::cout << "Enter board size (rows, cols) and number of mines: " << std::endl;
-    std::cin >> newRows >> newCols >> newMineCount;
+    // std::cin >> newRows >> newCols >> newMineCount;
+    if (!(std::cin >> newRows >> newCols >> newMineCount))
+        throw InputReadError();
 
     if (!isValidConfiguration(newRows, newCols, newMineCount))
     {
-        std::cout << "Invalid board configuration! Defaulting to 8x8 with 9 mines." << std::endl;
-        newRows = 8;
-        newCols = 8;
-        newMineCount = 9;
+        throw InvalidConfiguration(newRows, newCols, newMineCount);
+        // std::cout << "Invalid board configuration! Defaulting to 8x8 with 9 mines." << std::endl;
+        // newRows = 8;
+        // newCols = 8;
+        // newMineCount = 9;
     }
 
     int minutes;
     std::cout << "Enter round duration in minutes: " << std::endl;
-    std::cin >> minutes;
+    // std::cin >> minutes;
+    if (!(std::cin >> minutes)) {
+        throw InputReadError();
+    }
     if (minutes <= 0 || minutes > 59)
     {
-        std::cout << "Invalid round duration. Defaulting to 3 minutes." << std::endl;
-        minutes = 3;
+        throw InvalidRoundDuration(minutes);
+        // std::cout << "Invalid round duration. Defaulting to 3 minutes." << std::endl;
+        // minutes = 3;
     }
     customRoundDuration = std::chrono::minutes(minutes);
 

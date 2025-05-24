@@ -3,6 +3,7 @@
 #include <iostream>
 #include <thread>
 
+#include "Exceptions.h"
 #include "GameController.h"
 
 void Game::resetGameOver()
@@ -129,7 +130,8 @@ void Game::setupRound()
     std::cout << "Enter your nickname: " << std::endl;
     std::string newNickname;
     std::cin >> newNickname;
-    player.setNickname(newNickname);
+    if (!newNickname.empty())
+        player.setNickname(newNickname);
 
     std::cout << "Welcome to MineMaster, " << player.getNickname() << "!" << std::endl;
 }
@@ -173,6 +175,9 @@ void Game::play()
         displayRemainingTime();
         std::cout << "\n" << minefield << std::endl;
 
+        if (roundTimer.joinable())
+            roundTimer.detach();
+
         minefield.processMove();
 
         if (isGameOver())
@@ -182,8 +187,8 @@ void Game::play()
         }
     }
 
-    if (roundTimer.joinable())
-        roundTimer.detach();
+    // if (roundTimer.joinable())
+    //     roundTimer.detach();
 
     if (roundExpired)
     {

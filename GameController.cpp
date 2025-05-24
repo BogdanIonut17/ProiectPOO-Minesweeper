@@ -4,6 +4,7 @@
 
 #include "CustomGame.h"
 #include "EasyGame.h"
+#include "Exceptions.h"
 #include "HardGame.h"
 #include "MediumGame.h"
 
@@ -29,31 +30,31 @@ GameController& GameController::operator=(GameController other)
 
 void GameController::showMenu()
 {
-    std::cout << "\nSelect an option:\n";
-    std::cout << "1. Easy\n";
-    std::cout << "2. Medium\n";
-    std::cout << "3. Hard\n";
-    std::cout << "4. Custom\n";
-    std::cout << "5. Keep previous difficulty\n";\
-    std::cout << "6. Replay last round\n";
-    std::cout << "0. Exit\n";
-    std::cout << "Enter choice:\n ";
+    std::cout << "\nSelect an option: " << std::endl;
+    std::cout << "1. Easy" << std::endl;
+    std::cout << "2. Medium" << std::endl;
+    std::cout << "3. Hard" << std::endl;
+    std::cout << "4. Custom" << std::endl;
+    std::cout << "5. Keep previous difficulty" << std::endl;
+    std::cout << "6. Replay last round" << std::endl;
+    std::cout << "0. Exit" << std::endl;
+    std::cout << "Enter choice: " << std::endl;
 }
 
-std::shared_ptr<Game> GameController::createGame(const char choice)
+std::shared_ptr<Game> GameController::createGame(const int choice)
 {
     switch (choice)
     {
-    case '0':
+    case 0:
         {
-            std::cout << "\nGoodbye!\n";
+            std::cout << "\nGoodbye!" << std::endl;
             return nullptr;
         }
-    case '1': return std::make_shared<EasyGame>();
-    case '2': return std::make_shared<MediumGame>();
-    case '3': return std::make_shared<HardGame>();
-    case '4': return std::make_shared<CustomGame>();
-    case '5':
+    case 1: return std::make_shared<EasyGame>();
+    case 2: return std::make_shared<MediumGame>();
+    case 3: return std::make_shared<HardGame>();
+    case 4: return std::make_shared<CustomGame>();
+    case 5:
         {
             if (gameMode && !firstRound)
             {
@@ -61,27 +62,34 @@ std::shared_ptr<Game> GameController::createGame(const char choice)
                 gameMode->resetGameOver();
                 return gameMode;
             }
-            std::cout << "\nThis is your first round. Choose a difficulty (1, 2, 3) or type 0 to exit:\n";
+            std::cout << "\nThis is your first round. Choose a difficulty (1, 2, 3) or type 0 to exit:" << std::endl;
             showMenu();
-            char newChoice;
-            std::cin >> newChoice;
+            int newChoice;
+            // std::cin >> newChoice;
+            if (!(std::cin >> newChoice))
+                throw InputReadError();
             auto game = createGame(newChoice);
             return game;
         }
-    case '6':
+    case 6:
         {
             if (gameMode && !firstRound)
             {
                 auto customGame = std::dynamic_pointer_cast<CustomGame>(gameMode);
                 if (customGame)
+                {
                     customGame->markReplay();
+                    customGame->resetGameOver();
+                }
                 return gameMode;
             }
 
-            std::cout << "\nThis is your first round. Choose a difficulty (1, 2, 3) or type 0 to exit:\n";
+            std::cout << "\nThis is your first round. Choose a difficulty (1, 2, 3) or type 0 to exit:" << std::endl;
             showMenu();
-            char newChoice;
-            std::cin >> newChoice;
+            int newChoice;
+            // std::cin >> newChoice;
+            if (!(std::cin >> newChoice))
+                throw InputReadError();
             auto game = createGame(newChoice);
             return game;
         }
@@ -102,8 +110,10 @@ void GameController::run()
     if (firstRound)
     {
         showMenu();
-        char choice;
-        std::cin >> choice;
+        int choice;
+        // std::cin >> choice;
+        if (!(std::cin >> choice))
+            throw InputReadError();
 
         const auto game = createGame(choice);
         firstRound = false;
@@ -116,24 +126,25 @@ void GameController::run()
 
         Game::setTimeout([this]
         {
-            std::cout << "\nTime's up! Goodbye!\n";
+            std::cout << "\nTime's up! Goodbye!" << std::endl;
             timeExpired = true;
             if (!gameMode->isGameOver())
             {
-                std::cout << "Game over!\n";
+                std::cout << "Game over!" << std::endl;
                 std::cout << *gameMode << std::endl;
             }
             std::exit(0);
         }, totalTime);
     }
-
     while (!timeExpired)
     {
         gameMode->play();
 
         showMenu();
-        char choice;
-        std::cin >> choice;
+        int choice;
+        // std::cin >> choice;
+        if (!(std::cin >> choice))
+            throw InputReadError();
 
         auto newGame = createGame(choice);
         if (newGame)

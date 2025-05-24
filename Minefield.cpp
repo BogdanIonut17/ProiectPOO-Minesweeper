@@ -1,7 +1,6 @@
 #include "Minefield.h"
 #include "Cell.h"
-
-
+#include "Exceptions.h"
 #include <iomanip>
 #include <iostream>
 #include <queue>
@@ -255,19 +254,18 @@ void Minefield::setFieldSize(const int newRows, const int newCols, const int new
 void Minefield::resetField()
 {
     firstMove = false;
-    for (auto& row : grid)
+    for (int i = 0; i < rows; i++)
     {
-        for (auto& cell : row)
+        for (int j = 0; j < cols; j++)
         {
-            cell.cover();
-            if (cell.checkIfFlagged())
+            grid[i][j].cover();
+            if (grid[i][j].checkIfFlagged())
             {
-                cell.toggleFlag();
+                flagCell(i, j);
             }
         }
     }
 }
-
 
 void Minefield::flagCell(const int x, const int y)
 {
@@ -294,7 +292,7 @@ void Minefield::processMove()
     std::cin >> action;
     if (std::toupper(action) != 'R' && std::toupper(action) != 'F' && std::toupper(action) != 'S')
     {
-        std::cout << "Invalid move! Enter R x y to reveal, F x y to flag/unflag a cell or S to shuffle the mines: "
+        std::cout << "Invalid action! Enter R to reveal, F to flag/unflag a cell or S to shuffle the mines: "
             << std::endl;
         return;
     }
@@ -303,10 +301,15 @@ void Minefield::processMove()
         shuffleMines();
         return;
     }
-    std::cin >> cellX >> cellY;
+    // std::cin >> cellX >> cellY;
+
+    if (!(std::cin >> cellX >> cellY)) {
+        throw InputReadError();
+    }
+
     if (!isValidMove(cellX, cellY))
     {
-        std::cout << "Invalid move! Try again!" << std::endl;
+        std::cout << "Invalid cell coordinates! Try again!" << std::endl;
         return;
     }
     if (std::toupper(action) == 'R') revealCell(cellX, cellY);

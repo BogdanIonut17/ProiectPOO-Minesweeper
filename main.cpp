@@ -1,12 +1,22 @@
 // #include <SFML/Graphics.hpp>
 
+#include <iostream>
+
+#include "Exceptions.h"
 #include "GameController.h"
 
 
 int main()
 {
-    GameController controller;
-    controller.run();
+    try
+    {
+        GameController controller;
+        controller.run();
+    }
+    catch (const GameError& err)
+    {
+        std::cout << "\n[Game Error] " << err.what() << std::endl;
+    }
     return 0;
 
     // int choice;
