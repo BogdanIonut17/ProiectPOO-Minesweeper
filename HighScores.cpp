@@ -7,7 +7,7 @@ HighScore::HighScore(const int score) : score(score)
 {
 }
 
-std::string HighScore::getDifficulty() const
+const std::string& HighScore::getDifficulty() const
 {
     return difficulty;
 }

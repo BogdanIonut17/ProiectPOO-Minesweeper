@@ -18,7 +18,7 @@ public:
 
     virtual ~HighScore() = default;
 
-    [[nodiscard]] std::string getDifficulty() const;
+    [[nodiscard]] const std::string& getDifficulty() const;
 
     [[nodiscard]] int getScore() const;
 
