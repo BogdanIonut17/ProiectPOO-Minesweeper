@@ -6,6 +6,7 @@
 #include "Exceptions.h"
 #include "GameController.h"
 
+
 void Game::resetGameOver()
 {
     gameOver = false;
@@ -25,7 +26,7 @@ void Game::endGame()
         const std::chrono::milliseconds gameTimeLeft = roundDuration - elapsedTime;
 
         const int playerScore = std::max(0, static_cast<int>(gameTimeLeft.count()));
-        player.setScore(playerScore);
+        player->setScore(playerScore);
         updateHighScore();
 
         std::cout << "\nYou won!" << std::endl;
@@ -81,13 +82,12 @@ void Game::displayRemainingTime() const
     std::cout << "Time left: " << minutes << ":" << (seconds < 10 ? "0" : "") << seconds << "   " << std::endl;
 }
 
-Game::Game(const Minefield& minefield, const Player& player,
-           const std::chrono::minutes duration): minefield(minefield), player(player),
-                                                 gameOver(false), gameWon(false),
-                                                 startTime(std::chrono::steady_clock::now()),
-                                                 roundDuration(duration)
+Game::Game(const Minefield& minefield, const std::shared_ptr<Player>& player, const std::chrono::minutes duration)
+    : minefield(minefield), player(player), gameOver(false), gameWon(false),
+      startTime(std::chrono::steady_clock::now()), roundDuration(duration)
 {
 }
+
 
 Game::Game(const Game& other): minefield(other.minefield),
                                player(other.player),
@@ -110,9 +110,21 @@ Game& Game::operator=(const Game& other)
     return *this;
 }
 
+Minefield& Game::getMinefield()
+{
+    return minefield;
+}
+
+const std::shared_ptr<Player>& Game::getPlayer()
+{
+    return player;
+}
+
+
 [[nodiscard]] int Game::getPlayerScore() const
 {
-    return player.getScore();
+    return player->getScore();
+
 }
 
 void Game::setRoundDuration(const std::chrono::minutes customDuration)
@@ -124,16 +136,16 @@ void Game::setupRound()
 {
     gameOver = false;
     gameWon = false;
-    player.setScore(0);
+    player->setScore(0);
     minefield.setFirstMove();
 
     std::cout << "Enter your nickname: " << std::endl;
     std::string newNickname;
     std::cin >> newNickname;
     if (!newNickname.empty())
-        player.setNickname(newNickname);
+        player->setNickname(newNickname);
 
-    std::cout << "Welcome to MineMaster, " << player.getNickname() << "!" << std::endl;
+    std::cout << "Welcome to MineMaster, " << player->getNickname() << "!" << std::endl;
 
     setupDifficultyRound();
 }
@@ -145,7 +157,7 @@ void Game::play()
         minefield.resetField();
         gameOver = false;
         gameWon = false;
-        player.setScore(0);
+        player->setScore(0);
     }
     else
     {
@@ -200,12 +212,6 @@ void Game::play()
     std::cout << *this << std::endl;
 }
 
-Minefield& Game::getMinefield()
-{
-    return minefield;
-}
-
-
 std::ostream& operator<<(std::ostream& os, const Game& game)
 {
     if (game.gameOver)
@@ -213,8 +219,8 @@ std::ostream& operator<<(std::ostream& os, const Game& game)
         os << "Game over!" << std::endl;
     }
     os << "\nDifficulty: ";
-    game.displayMode(os);
-    os << game.player;
+    game.displayDifficulty(os);
+    os << *game.player;
     os << "Highscore: " << game.getHighScore() << std::endl;
     os << game.minefield << std::endl;
     return os;

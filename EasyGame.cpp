@@ -1,11 +1,13 @@
 #include "EasyGame.h"
+
 #include <iostream>
-#include <thread>
+
+#include "HighScores.h"
 
 
 int EasyGame::easyHighScore = 0;
 
-EasyGame::EasyGame() : Game(Minefield(9, 9, 10), Player("Player1"), std::chrono::minutes(3))
+EasyGame::EasyGame() : Game(Minefield(9, 9, 10), std::make_shared<Player>("Player1"), std::chrono::minutes(3))
 {
 }
 
@@ -17,7 +19,11 @@ int EasyGame::getHighScore() const
 void EasyGame::updateHighScore()
 {
     if (getPlayerScore() > easyHighScore)
+    {
         easyHighScore = getPlayerScore();
+        const auto hs = std::make_shared<EasyHighScore>(getHighScore());
+        getPlayer()->addOrUpdateHighScore(hs);
+    }
 }
 
 void EasyGame::setupDifficultyRound()
@@ -26,7 +32,7 @@ void EasyGame::setupDifficultyRound()
     getMinefield().setFieldSize(9, 9, 10);
 }
 
-void EasyGame::displayMode(std::ostream& os) const
+void EasyGame::displayDifficulty(std::ostream& os) const
 {
     os << "Easy" << std::endl;
 }

@@ -20,7 +20,7 @@ private:
 
     void setupDifficultyRound() override;
 
-    void displayMode(std::ostream& os) const override;
+    void displayDifficulty(std::ostream& os) const override;
 
     [[nodiscard]] std::shared_ptr<Game> clone() const override;
 };

@@ -5,6 +5,7 @@
 #include <chrono>
 #include <functional>
 #include <memory>
+#include <set>
 
 #include "Minefield.h"
 #include "Player.h"
@@ -13,7 +14,7 @@
 class Game
 {
     Minefield minefield;
-    Player player;
+    std::shared_ptr<Player> player;
     bool gameOver;
     bool gameWon;
     std::chrono::steady_clock::time_point startTime;
@@ -28,7 +29,7 @@ class Game
 
     void displayRemainingTime() const;
 
-    virtual void displayMode(std::ostream&) const = 0;
+    virtual void displayDifficulty(std::ostream&) const = 0;
 
 protected:
     Game(const Game& other);
@@ -37,6 +38,8 @@ protected:
 
     [[nodiscard]] Minefield& getMinefield();
 
+    [[nodiscard]] const std::shared_ptr<Player>& getPlayer();
+
     [[nodiscard]] int getPlayerScore() const;
 
     [[nodiscard]] static bool isValidConfiguration(int rows, int cols, int mineCount);
@@ -44,8 +47,7 @@ protected:
     void setRoundDuration(std::chrono::minutes customDuration);
 
 public:
-    Game(const Minefield& minefield, const Player& player,
-         std::chrono::minutes duration);
+    Game(const Minefield& minefield, const std::shared_ptr<Player>& player, std::chrono::minutes duration);
 
     virtual ~Game() = default;
 

@@ -6,10 +6,12 @@
 #include "Exceptions.h"
 #include <iostream>
 
+#include "HighScores.h"
+
 
 int CustomGame::customHighScore = 0;
 
-CustomGame::CustomGame() : Game(Minefield(8, 8, 9), Player("Player1"), std::chrono::minutes(3)), savedRows(8),
+CustomGame::CustomGame() : Game(Minefield(8, 8, 9), std::make_shared<Player>("Player1"), std::chrono::minutes(3)), savedRows(8),
                            savedCols(8), savedMineCount(9), customRoundDuration(std::chrono::minutes(3)),
                            isReplay(false)
 {
@@ -23,7 +25,11 @@ int CustomGame::getHighScore() const
 void CustomGame::updateHighScore()
 {
     if (getPlayerScore() > customHighScore)
+    {
         customHighScore = getPlayerScore();
+        const auto hs = std::make_shared<CustomHighScore>(getHighScore());
+        getPlayer()->addOrUpdateHighScore(hs);
+    }
 }
 
 void CustomGame::markReplay()
@@ -85,7 +91,7 @@ void CustomGame::setupDifficultyRound()
     setRoundDuration(customRoundDuration);
 }
 
-void CustomGame::displayMode(std::ostream& os) const
+void CustomGame::displayDifficulty(std::ostream& os) const
 {
     os << "Custom" << std::endl;
 }

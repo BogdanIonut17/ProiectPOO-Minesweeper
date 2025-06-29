@@ -7,6 +7,7 @@
 #include "Exceptions.h"
 #include "HardGame.h"
 #include "MediumGame.h"
+#include "HighScores.h"
 
 
 bool GameController::firstRound = true;
@@ -37,8 +38,20 @@ void GameController::showMenu()
     std::cout << "4. Custom" << std::endl;
     std::cout << "5. Keep previous difficulty" << std::endl;
     std::cout << "6. Replay last round" << std::endl;
+    std::cout << "7. Display highscores" << std::endl;
     std::cout << "0. Exit" << std::endl;
     std::cout << "Enter choice: " << std::endl;
+}
+
+void GameController::showHighScores() {
+
+    std::cout << "\n=== Highscores ===" << std::endl;
+    for (const auto& [name, hscores] : Player::getHighScores()) {
+        std::cout << "Player: " << name << std::endl;
+        for (const auto& hs : hscores) {
+            std::cout << "  - " << *hs << std::endl;
+        }
+    }
 }
 
 std::shared_ptr<Game> GameController::createGame(const int choice)
@@ -58,7 +71,9 @@ std::shared_ptr<Game> GameController::createGame(const int choice)
         {
             if (gameMode && !firstRound)
             {
-                setGameMode(gameMode->clone());
+                // setGameMode(gameMode->clone());
+
+                gameMode = gameMode->clone();
                 gameMode->resetGameOver();
                 return gameMode;
             }
@@ -93,14 +108,29 @@ std::shared_ptr<Game> GameController::createGame(const int choice)
             auto game = createGame(newChoice);
             return game;
         }
+    case 7:
+        {
+            if (gameMode && !firstRound)
+            {
+                showHighScores();
+            }
+            std::cout << "\nThis is your first round. Choose a difficulty (1, 2, 3) or type 0 to exit:" << std::endl;
+            showMenu();
+            int newChoice;
+            // std::cin >> newChoice;
+            if (!(std::cin >> newChoice))
+                throw InputReadError();
+            auto game = createGame(newChoice);
+            return game;
+        }
     default: return std::make_shared<EasyGame>();
     }
 }
 
-void GameController::setGameMode(const std::shared_ptr<Game>& game)
-{
-    gameMode = game;
-}
+// void GameController::setGameMode(const std::shared_ptr<Game>& game)
+// {
+//     gameMode = game;
+// }
 
 void GameController::run()
 {
@@ -120,7 +150,8 @@ void GameController::run()
 
         if (game)
         {
-            setGameMode(game);
+            // setGameMode(game);
+            gameMode = game;
         }
         else return;
 
@@ -149,8 +180,12 @@ void GameController::run()
         auto newGame = createGame(choice);
         if (newGame)
         {
-            setGameMode(newGame);
+            // setGameMode(newGame);
+            gameMode = newGame;
         }
+        // if (choice == 7) {
+        //     showHighScores();
+        // }
         else return;
     }
 }

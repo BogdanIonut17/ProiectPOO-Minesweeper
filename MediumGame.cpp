@@ -1,12 +1,13 @@
 #include "MediumGame.h"
 
 #include <iostream>
-#include <thread>
+
+#include "HighScores.h"
 
 
 int MediumGame::mediumHighScore = 0;
 
-MediumGame::MediumGame() : Game(Minefield(16, 16, 40), Player("Player1"), std::chrono::minutes(5))
+MediumGame::MediumGame() : Game(Minefield(9, 9, 10), std::make_shared<Player>("Player1"), std::chrono::minutes(3))
 {
 }
 
@@ -18,7 +19,11 @@ int MediumGame::getHighScore() const
 void MediumGame::updateHighScore()
 {
     if (getPlayerScore() > mediumHighScore)
+    {
         mediumHighScore = getPlayerScore();
+        const auto hs = std::make_shared<MediumHighScore>(getHighScore());
+        getPlayer()->addOrUpdateHighScore(hs);
+    }
 }
 
 void MediumGame::setupDifficultyRound()
@@ -27,11 +32,10 @@ void MediumGame::setupDifficultyRound()
     getMinefield().setFieldSize(16, 16, 40);
 }
 
-void MediumGame::displayMode(std::ostream& os) const
+void MediumGame::displayDifficulty(std::ostream& os) const
 {
     os << "Medium" << std::endl;
 }
-
 
 std::shared_ptr<Game> MediumGame::clone() const
 {

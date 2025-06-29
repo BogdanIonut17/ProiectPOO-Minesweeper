@@ -1,12 +1,13 @@
 #include "HardGame.h"
 
 #include <iostream>
-#include <thread>
+
+#include "HighScores.h"
 
 
 int HardGame::hardHighScore = 0;
 
-HardGame::HardGame() : Game(Minefield(16, 30, 99), Player("Player1"), std::chrono::minutes(10))
+HardGame::HardGame() : Game(Minefield(9, 9, 10), std::make_shared<Player>("Player1"), std::chrono::minutes(3))
 {
 }
 
@@ -18,7 +19,11 @@ int HardGame::getHighScore() const
 void HardGame::updateHighScore()
 {
     if (getPlayerScore() > hardHighScore)
+    {
         hardHighScore = getPlayerScore();
+        const auto hs = std::make_shared<HardHighScore>(getHighScore());
+        getPlayer()->addOrUpdateHighScore(hs);
+    }
 }
 
 void HardGame::setupDifficultyRound()
@@ -27,7 +32,7 @@ void HardGame::setupDifficultyRound()
     getMinefield().setFieldSize(16, 30, 99);
 }
 
-void HardGame::displayMode(std::ostream& os) const
+void HardGame::displayDifficulty(std::ostream& os) const
 {
     os << "Hard" << std::endl;
 }
@@ -36,4 +41,3 @@ std::shared_ptr<Game> HardGame::clone() const
 {
     return std::make_shared<HardGame>(*this);
 }
-
