@@ -5,6 +5,7 @@
 #ifndef EXCEPTIONS_H
 #define EXCEPTIONS_H
 
+
 #include <stdexcept>
 #include <string>
 
@@ -41,6 +42,8 @@ public:
     {
     }
 };
+
+
 
 
 #endif //EXCEPTIONS_H

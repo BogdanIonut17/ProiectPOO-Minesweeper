@@ -1,6 +1,7 @@
 #include "Minefield.h"
 #include "Cell.h"
 #include "Exceptions.h"
+
 #include <iomanip>
 #include <iostream>
 #include <queue>

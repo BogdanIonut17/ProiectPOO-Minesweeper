@@ -4,6 +4,8 @@
 
 #ifndef CUSTOMGAME_H
 #define CUSTOMGAME_H
+
+
 #include "Game.h"
 
 
@@ -32,6 +34,8 @@ private:
 
     [[nodiscard]] std::shared_ptr<Game> clone() const override;
 };
+
+
 
 
 #endif //CUSTOMGAME_H

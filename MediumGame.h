@@ -1,5 +1,7 @@
 #ifndef MEDIUMGAME_H
 #define MEDIUMGAME_H
+
+
 #include "Game.h"
 
 
@@ -20,6 +22,7 @@ private:
 
     [[nodiscard]] std::shared_ptr<Game> clone() const override;
 };
+
 
 
 

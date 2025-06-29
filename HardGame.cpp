@@ -7,7 +7,7 @@
 
 int HardGame::hardHighScore = 0;
 
-HardGame::HardGame() : Game(Minefield(9, 9, 10), std::make_shared<Player>("Player1"), std::chrono::minutes(3))
+HardGame::HardGame() : Game(Minefield(16, 30, 99), std::make_shared<Player>("Player1"), std::chrono::minutes(10))
 {
 }
 

@@ -1,5 +1,7 @@
 #ifndef HARDGAME_H
 #define HARDGAME_H
+
+
 #include "Game.h"
 
 
@@ -21,6 +23,8 @@ private:
 
     [[nodiscard]] std::shared_ptr<Game> clone() const override;
 };
+
+
 
 
 #endif //HARDGAME_H

@@ -33,14 +33,14 @@ GameController& GameController::operator=(GameController other)
 void GameController::showMenu()
 {
     std::cout << "\nSelect an option: " << std::endl;
-    std::cout << "1. Easy" << std::endl;
-    std::cout << "2. Medium" << std::endl;
-    std::cout << "3. Hard" << std::endl;
-    std::cout << "4. Custom" << std::endl;
-    std::cout << "5. Keep previous difficulty" << std::endl;
-    std::cout << "6. Replay last round" << std::endl;
-    std::cout << "7. Display highscores" << std::endl;
-    std::cout << "8. Classic" << std::endl;
+    std::cout << "1. Classic" << std::endl;
+    std::cout << "2. Easy" << std::endl;
+    std::cout << "3. Medium" << std::endl;
+    std::cout << "4. Hard" << std::endl;
+    std::cout << "5. Custom" << std::endl;
+    std::cout << "6. Keep previous difficulty" << std::endl;
+    std::cout << "7. Replay last round" << std::endl;
+    std::cout << "8. Display highscores" << std::endl;
     std::cout << "0. Exit" << std::endl;
     std::cout << "Enter choice: " << std::endl;
 }
@@ -89,12 +89,12 @@ std::shared_ptr<Game> GameController::createGame(const int choice)
             std::cout << "\nGoodbye!" << std::endl;
             return nullptr;
         }
-    case 1: return std::make_shared<EasyGame>();
-    case 2: return std::make_shared<MediumGame>();
-    case 3: return std::make_shared<HardGame>();
-    case 4: return std::make_shared<CustomGame>();
-    case 8: return std::make_shared<ClassicGame>();
-    case 5:
+    case 1: return std::make_shared<ClassicGame>();
+    case 2: return std::make_shared<EasyGame>();
+    case 3: return std::make_shared<MediumGame>();
+    case 4: return std::make_shared<HardGame>();
+    case 5: return std::make_shared<CustomGame>();
+    case 6:
         {
             if (gameMode && !firstRound)
             {
@@ -114,7 +114,7 @@ std::shared_ptr<Game> GameController::createGame(const int choice)
             auto game = createGame(newChoice);
             return game;
         }
-    case 6:
+    case 7:
         {
             if (gameMode && !firstRound)
             {
@@ -127,7 +127,7 @@ std::shared_ptr<Game> GameController::createGame(const int choice)
                 return gameMode;
             }
 
-            std::cout << "\nThis is your first round. Choose a difficulty (1, 2, 3, 4) or type 0 to exit:" << std::endl;
+            std::cout << "\nThis is your first round. Choose a difficulty (1, 2, 3, 4 and 5) or type 0 to exit:" << std::endl;
             showMenu();
             int newChoice;
             // std::cin >> newChoice;
@@ -136,7 +136,7 @@ std::shared_ptr<Game> GameController::createGame(const int choice)
             auto game = createGame(newChoice);
             return game;
         }
-    case 7:
+    case 8:
         {
             if (gameMode && !firstRound)
             {
@@ -150,7 +150,7 @@ std::shared_ptr<Game> GameController::createGame(const int choice)
                 return game;
             }
 
-            std::cout << "\nThis is your first round. Choose a difficulty (1, 2, 3, 4) or type 0 to exit:" << std::endl;
+            std::cout << "\nThis is your first round. Choose a difficulty (1, 2, 3, 4 and 8) or type 0 to exit:" << std::endl;
             showMenu();
             int newChoice;
             // std::cin >> newChoice;

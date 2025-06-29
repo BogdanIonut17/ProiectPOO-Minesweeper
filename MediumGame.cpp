@@ -7,7 +7,7 @@
 
 int MediumGame::mediumHighScore = 0;
 
-MediumGame::MediumGame() : Game(Minefield(9, 9, 10), std::make_shared<Player>("Player1"), std::chrono::minutes(3))
+MediumGame::MediumGame() : Game(Minefield(16, 16, 40), std::make_shared<Player>("Player1"), std::chrono::minutes(5))
 {
 }
 
