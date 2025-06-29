@@ -20,6 +20,7 @@ class Game
     std::chrono::steady_clock::time_point startTime;
     std::chrono::seconds roundDuration;
     std::atomic<int> roundTimeLeftSeconds;
+    // static std::vector<std::shared_ptr<Player>> allPlayers;
 
     [[nodiscard]] virtual int getHighScore() const = 0;
 
@@ -56,6 +57,8 @@ public:
     bool isGameOver();
 
     void resetGameOver();
+
+    // static const std::vector<std::shared_ptr<Player>>& getAllPlayers();
 
     static void setTimeout(const std::function<void()>& func, std::chrono::milliseconds delay);
 

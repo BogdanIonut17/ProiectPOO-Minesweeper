@@ -43,15 +43,39 @@ void GameController::showMenu()
     std::cout << "Enter choice: " << std::endl;
 }
 
-void GameController::showHighScores() {
-
+void GameController::showHighScores()
+{
     std::cout << "\n=== Highscores ===" << std::endl;
-    for (const auto& [name, hscores] : Player::getHighScores()) {
+    for (const auto& [name, hscores] : Player::getHighScores())
+    {
         std::cout << "Player: " << name << std::endl;
-        for (const auto& hs : hscores) {
+        for (const auto& hs : hscores)
+        {
             std::cout << "  - " << *hs << std::endl;
         }
     }
+
+    // const auto& players = Game::getAllPlayers();
+    // if (players.empty()) {
+    //     std::cout << "\nNo players registered yet.\n";
+    //     return;
+    // }
+    //
+    // std::cout << "\n=== HIGH SCORES ===\n";
+    //
+    // for (const auto& player : players) {
+    //     std::cout << "\nPlayer: " << player->getNickname() << "\n";
+    //     const auto& scores = player->getHighScores();
+    //     if (scores.empty()) {
+    //         std::cout << "  No scores yet.\n";
+    //     } else {
+    //         for (const auto& hs : scores) {
+    //             std::cout << "  - " << *hs << "\n";
+    //         }
+    //     }
+    // }
+    //
+    // std::cout << "=====================\n";
 }
 
 std::shared_ptr<Game> GameController::createGame(const int choice)
@@ -77,7 +101,8 @@ std::shared_ptr<Game> GameController::createGame(const int choice)
                 gameMode->resetGameOver();
                 return gameMode;
             }
-            std::cout << "\nThis is your first round. Choose a difficulty (1, 2, 3) or type 0 to exit:" << std::endl;
+
+            std::cout << "\nThis is your first round. Choose a difficulty (1, 2, 3, 4) or type 0 to exit:" << std::endl;
             showMenu();
             int newChoice;
             // std::cin >> newChoice;
@@ -99,7 +124,7 @@ std::shared_ptr<Game> GameController::createGame(const int choice)
                 return gameMode;
             }
 
-            std::cout << "\nThis is your first round. Choose a difficulty (1, 2, 3) or type 0 to exit:" << std::endl;
+            std::cout << "\nThis is your first round. Choose a difficulty (1, 2, 3, 4) or type 0 to exit:" << std::endl;
             showMenu();
             int newChoice;
             // std::cin >> newChoice;
@@ -113,8 +138,16 @@ std::shared_ptr<Game> GameController::createGame(const int choice)
             if (gameMode && !firstRound)
             {
                 showHighScores();
+                showMenu();
+                int newChoice;
+                // std::cin >> newChoice;
+                if (!(std::cin >> newChoice))
+                    throw InputReadError();
+                auto game = createGame(newChoice);
+                return game;
             }
-            std::cout << "\nThis is your first round. Choose a difficulty (1, 2, 3) or type 0 to exit:" << std::endl;
+
+            std::cout << "\nThis is your first round. Choose a difficulty (1, 2, 3, 4) or type 0 to exit:" << std::endl;
             showMenu();
             int newChoice;
             // std::cin >> newChoice;

@@ -6,6 +6,11 @@
 #include "Exceptions.h"
 #include "GameController.h"
 
+// std::vector<std::shared_ptr<Player>> Game::allPlayers;
+//
+// const std::vector<std::shared_ptr<Player>>& Game::getAllPlayers() {
+//     return allPlayers;
+// }
 
 void Game::resetGameOver()
 {
@@ -86,6 +91,7 @@ Game::Game(const Minefield& minefield, const std::shared_ptr<Player>& player, co
     : minefield(minefield), player(player), gameOver(false), gameWon(false),
       startTime(std::chrono::steady_clock::now()), roundDuration(duration)
 {
+    // Game::allPlayers.push_back(player);
 }
 
 
@@ -124,7 +130,6 @@ const std::shared_ptr<Player>& Game::getPlayer()
 [[nodiscard]] int Game::getPlayerScore() const
 {
     return player->getScore();
-
 }
 
 void Game::setRoundDuration(const std::chrono::minutes customDuration)

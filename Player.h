@@ -25,7 +25,7 @@ public:
 
     void setScore(int playerScore);
 
-    void addOrUpdateHighScore(const std::shared_ptr<HighScore>& score);
+    void addOrUpdateHighScore(const std::shared_ptr<HighScore>& hscore);
 
     [[nodiscard]] static const std::map<std::string, std::vector<std::shared_ptr<HighScore>>>& getHighScores();
 

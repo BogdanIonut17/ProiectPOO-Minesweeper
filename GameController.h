@@ -30,7 +30,6 @@ public:
     friend void swap(GameController& lhs, GameController& rhs) noexcept;
 
     void run();
-
 };
 
 

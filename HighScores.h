@@ -6,8 +6,10 @@
 #include <iostream>
 
 
-class HighScore {
+class HighScore
+{
     int score;
+
 protected:
     std::string difficulty;
 
@@ -29,7 +31,8 @@ public:
     friend std::ostream& operator<<(std::ostream& os, const HighScore& hs);
 };
 
-class EasyHighScore : public HighScore {
+class EasyHighScore : public HighScore
+{
 public:
     explicit EasyHighScore(int score);
 
@@ -38,7 +41,8 @@ public:
     [[nodiscard]] std::shared_ptr<HighScore> clone() const override;
 };
 
-class MediumHighScore : public HighScore {
+class MediumHighScore : public HighScore
+{
 public:
     explicit MediumHighScore(int score);
 
@@ -47,7 +51,8 @@ public:
     [[nodiscard]] std::shared_ptr<HighScore> clone() const override;
 };
 
-class HardHighScore : public HighScore {
+class HardHighScore : public HighScore
+{
 public:
     explicit HardHighScore(int score);
 
@@ -56,9 +61,20 @@ public:
     [[nodiscard]] std::shared_ptr<HighScore> clone() const override;
 };
 
-class CustomHighScore : public HighScore {
+class CustomHighScore : public HighScore
+{
 public:
     explicit CustomHighScore(int score);
+
+    void display(std::ostream& os) const override;
+
+    [[nodiscard]] std::shared_ptr<HighScore> clone() const override;
+};
+
+class ClassicHighScore : public HighScore
+{
+public:
+    explicit ClassicHighScore(int score);
 
     void display(std::ostream& os) const override;
 

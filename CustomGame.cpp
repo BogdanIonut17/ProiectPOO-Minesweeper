@@ -11,7 +11,8 @@
 
 int CustomGame::customHighScore = 0;
 
-CustomGame::CustomGame() : Game(Minefield(8, 8, 9), std::make_shared<Player>("Player1"), std::chrono::minutes(3)), savedRows(8),
+CustomGame::CustomGame() : Game(Minefield(8, 8, 9), std::make_shared<Player>("Player1"), std::chrono::minutes(3)),
+                           savedRows(8),
                            savedCols(8), savedMineCount(9), customRoundDuration(std::chrono::minutes(3)),
                            isReplay(false)
 {

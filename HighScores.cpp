@@ -3,14 +3,17 @@
 #include <iomanip>
 
 
-HighScore::HighScore(const int score) : score(score) {}
+HighScore::HighScore(const int score) : score(score)
+{
+}
 
-// std::string HighScore::getDifficulty() const
-// {
-//     return difficulty;
-// }
+std::string HighScore::getDifficulty() const
+{
+    return difficulty;
+}
 
-int HighScore::getScore() const {
+int HighScore::getScore() const
+{
     return score;
 }
 
@@ -19,7 +22,8 @@ bool HighScore::isBetterThan(const HighScore& other) const
     return this->score > other.score;
 }
 
-std::ostream& operator<<(std::ostream& os, const HighScore& hs) {
+std::ostream& operator<<(std::ostream& os, const HighScore& hs)
+{
     os << "Difficulty: ";
     hs.display(os);
     return os;
@@ -32,8 +36,9 @@ EasyHighScore::EasyHighScore(const int score)
     difficulty = "Easy";
 }
 
-void EasyHighScore::display(std::ostream& os) const {
-    os << std::left << std::setw(7) << "Easy" << "| Score: " << getScore();
+void EasyHighScore::display(std::ostream& os) const
+{
+    os << std::left << std::setw(8) << "Easy" << "| Score: " << getScore();
 }
 
 std::shared_ptr<HighScore> EasyHighScore::clone() const
@@ -43,10 +48,13 @@ std::shared_ptr<HighScore> EasyHighScore::clone() const
 
 
 MediumHighScore::MediumHighScore(const int score)
-    : HighScore(score) {}
+    : HighScore(score)
+{
+}
 
-void MediumHighScore::display(std::ostream& os) const {
-    os << std::left << std::setw(7) << "Medium" << "| Score: " << getScore();
+void MediumHighScore::display(std::ostream& os) const
+{
+    os << std::left << std::setw(8) << "Medium" << "| Score: " << getScore();
 }
 
 std::shared_ptr<HighScore> MediumHighScore::clone() const
@@ -56,10 +64,13 @@ std::shared_ptr<HighScore> MediumHighScore::clone() const
 
 
 HardHighScore::HardHighScore(const int score)
-    : HighScore(score) {}
+    : HighScore(score)
+{
+}
 
-void HardHighScore::display(std::ostream& os) const {
-    os << std::left << std::setw(7) << "Hard" << "| Score: " << getScore();
+void HardHighScore::display(std::ostream& os) const
+{
+    os << std::left << std::setw(8) << "Hard" << "| Score: " << getScore();
 }
 
 std::shared_ptr<HighScore> HardHighScore::clone() const
@@ -74,13 +85,30 @@ CustomHighScore::CustomHighScore(const int score)
     difficulty = "Custom";
 }
 
-void CustomHighScore::display(std::ostream& os) const {
-    os << std::left << std::setw(7) << "Custom" << "| Score: " << getScore();
+void CustomHighScore::display(std::ostream& os) const
+{
+    os << std::left << std::setw(8) << "Custom" << "| Score: " << getScore();
 }
 
 std::shared_ptr<HighScore> CustomHighScore::clone() const
 {
     return std::make_shared<CustomHighScore>(getScore());
+}
+
+ClassicHighScore::ClassicHighScore(const int score)
+    : HighScore(score)
+{
+    difficulty = "Classic";
+}
+
+void ClassicHighScore::display(std::ostream& os) const
+{
+    os << std::left << std::setw(8) << "Classic" << "| Score: " << getScore();
+}
+
+std::shared_ptr<HighScore> ClassicHighScore::clone() const
+{
+    return std::make_shared<ClassicHighScore>(getScore());
 }
 
 

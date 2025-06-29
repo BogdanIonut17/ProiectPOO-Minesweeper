@@ -29,23 +29,40 @@ void Player::setScore(const int playerScore)
     score = playerScore;
 }
 
-void Player::addOrUpdateHighScore(const std::shared_ptr<HighScore>& score)
+void Player::addOrUpdateHighScore(const std::shared_ptr<HighScore>& hscore)
 {
     auto& hs = highScores[nickname];
     if (hs.empty())
     {
-        hs.push_back(score->clone());
+        hs.push_back(hscore->clone());
         return;
     }
-    for (auto& existing : hs) {
-        if (typeid(*existing) == typeid(*score)) {
-            if (score->isBetterThan(*existing)) {
-                existing = score;
+    // const auto& scoreRef = *score;  // evita evaluarea multiplă
+    // for (auto& existing : hs)
+    // {
+    //     const auto& existingRef = *existing;
+    //     if (typeid(existingRef) == typeid(scoreRef))
+    //     {
+    //         if (score->isBetterThan(existingRef))
+    //         {
+    //             existing = score;
+    //         }
+    //         return;
+    //     }
+    // }
+    for (auto& existing : hs)
+    {
+        // if (typeid(*existing) == typeid(*hscore))
+        if (existing->getDifficulty() == hscore->getDifficulty())
+        {
+            if (hscore->isBetterThan(*existing))
+            {
+                existing = hscore;
             }
             return;
         }
     }
-    hs.push_back(score->clone());
+    hs.push_back(hscore->clone());
 }
 
 const std::map<std::string, std::vector<std::shared_ptr<HighScore>>>& Player::getHighScores()
