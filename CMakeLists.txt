@@ -80,6 +80,8 @@ add_executable(${MAIN_EXECUTABLE_NAME}
         Exceptions.h
         HighScores.cpp
         HighScores.h
+        ClassicGame.cpp
+        ClassicGame.h
 )
 
 # NOTE: Add all defined targets (e.g. executables, libraries, etc. )

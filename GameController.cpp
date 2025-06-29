@@ -2,6 +2,7 @@
 
 #include <iostream>
 
+#include "ClassicGame.h"
 #include "CustomGame.h"
 #include "EasyGame.h"
 #include "Exceptions.h"
@@ -39,6 +40,7 @@ void GameController::showMenu()
     std::cout << "5. Keep previous difficulty" << std::endl;
     std::cout << "6. Replay last round" << std::endl;
     std::cout << "7. Display highscores" << std::endl;
+    std::cout << "8. Classic" << std::endl;
     std::cout << "0. Exit" << std::endl;
     std::cout << "Enter choice: " << std::endl;
 }
@@ -91,6 +93,7 @@ std::shared_ptr<Game> GameController::createGame(const int choice)
     case 2: return std::make_shared<MediumGame>();
     case 3: return std::make_shared<HardGame>();
     case 4: return std::make_shared<CustomGame>();
+    case 8: return std::make_shared<ClassicGame>();
     case 5:
         {
             if (gameMode && !firstRound)
@@ -156,7 +159,7 @@ std::shared_ptr<Game> GameController::createGame(const int choice)
             auto game = createGame(newChoice);
             return game;
         }
-    default: return std::make_shared<EasyGame>();
+    default: return std::make_shared<ClassicGame>();
     }
 }
 
