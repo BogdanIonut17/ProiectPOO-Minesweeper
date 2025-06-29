@@ -17,8 +17,9 @@
 #include "HighScores.h"
 
 
-template<class T>
-class GameFactory {
+template <class T>
+class GameFactory
+{
 public:
     virtual ~GameFactory() = default;
 
@@ -123,8 +124,6 @@ inline std::shared_ptr<Game> CustomGameFactory::createHighScore(int) const
 }
 
 
-
-
 class ClassicHighscoreFactory : public GameFactory<HighScore>
 {
 public:
@@ -218,8 +217,6 @@ inline std::shared_ptr<HighScore> CustomHighscoreFactory::createGame() const
 {
     return nullptr;
 }
-
-
 
 
 #endif //GAMEFACTORY_H

@@ -30,6 +30,11 @@ void EasyGame::updateHighScore()
     }
 }
 
+std::string EasyGame::getDifficulty() const
+{
+    return "Easy";
+}
+
 void EasyGame::setupDifficultyRound()
 {
     std::cout << "Easy mode: 9x9 board with 10 mines" << std::endl;

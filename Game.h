@@ -7,6 +7,7 @@
 #include <memory>
 // #include <set>
 
+#include "HighScores.h"
 #include "Minefield.h"
 #include "Player.h"
 
@@ -25,6 +26,10 @@ class Game
     [[nodiscard]] virtual int getHighScore() const = 0;
 
     virtual void updateHighScore() = 0;
+
+    [[nodiscard]] virtual std::string getDifficulty() const = 0;
+
+    [[nodiscard]] std::shared_ptr<HighScore> getPlayerHighScore() const;
 
     virtual void setupDifficultyRound() = 0;
 

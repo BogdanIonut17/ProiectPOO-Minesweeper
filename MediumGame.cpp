@@ -30,6 +30,12 @@ void MediumGame::updateHighScore()
     }
 }
 
+std::string MediumGame::getDifficulty() const
+{
+    return "Medium";
+}
+
+
 void MediumGame::setupDifficultyRound()
 {
     std::cout << "Medium mode: 16x16 board with 40 mines" << std::endl;

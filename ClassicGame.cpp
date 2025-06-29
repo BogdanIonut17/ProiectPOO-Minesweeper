@@ -34,6 +34,11 @@ void ClassicGame::updateHighScore()
     }
 }
 
+std::string ClassicGame::getDifficulty() const
+{
+    return "Classic";
+}
+
 void ClassicGame::setupDifficultyRound()
 {
     std::cout << "Classic mode: 8x8 board with 9 mines" << std::endl;

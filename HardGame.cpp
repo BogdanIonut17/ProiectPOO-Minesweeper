@@ -30,6 +30,11 @@ void HardGame::updateHighScore()
     }
 }
 
+std::string HardGame::getDifficulty() const
+{
+    return "Hard";
+}
+
 void HardGame::setupDifficultyRound()
 {
     std::cout << "Hard mode: 16x30 board with 99 mines" << std::endl;

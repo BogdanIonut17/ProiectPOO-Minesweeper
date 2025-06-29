@@ -17,6 +17,8 @@ private:
 
     void updateHighScore() override;
 
+    [[nodiscard]] std::string getDifficulty() const override;
+
     void setupDifficultyRound() override;
 
     void displayDifficulty(std::ostream&) const override;

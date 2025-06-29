@@ -70,6 +70,26 @@ const std::map<std::string, std::vector<std::shared_ptr<HighScore>>>& Player::ge
     return highScores;
 }
 
+// std::shared_ptr<HighScore> Player::getPlayerHighScore() const {
+//     const auto& allScores = highScores;
+//     const auto it = allScores.find(nickname);
+//     if (it == allScores.end())
+//     {
+//         return nullptr;
+//     }
+//
+//     const auto& scores = it->second;
+//
+//     for (const auto& hs : scores) {
+//         if (hs && hs->getDifficulty() == this->getDifficulty()) {
+//             return hs;
+//         }
+//     }
+//
+//     return nullptr;
+// }
+
+
 std::ostream& operator<<(std::ostream& os, const Player& player)
 {
     os << "Player: " << player.nickname << std::endl;

@@ -79,6 +79,26 @@ void Game::setTimeout(const std::function<void()>& func, std::chrono::millisecon
     }).detach();
 }
 
+std::shared_ptr<HighScore> Game::getPlayerHighScore() const
+{
+    const auto& allScores = Player::getHighScores();
+    const auto it = allScores.find(player->getNickname());
+    if (it == allScores.end())
+    {
+        return nullptr;
+    }
+
+    const auto& scores = it->second;
+
+    for (const auto& hs : scores) {
+        if (hs && hs->getDifficulty() == this->getDifficulty()) {
+            return hs;
+        }
+    }
+
+    return nullptr;
+}
+
 void Game::displayRemainingTime() const
 {
     const int minutes = roundTimeLeftSeconds.load() / 60;
@@ -223,10 +243,22 @@ std::ostream& operator<<(std::ostream& os, const Game& game)
     {
         os << "Game over!" << std::endl;
     }
+
     os << "\nDifficulty: ";
     game.displayDifficulty(os);
     os << *game.player;
     os << "Highscore: " << game.getHighScore() << std::endl;
+    os << "Your Highscore: ";
+
+    if (game.getPlayerHighScore())
+    {
+       os << game.getPlayerHighScore()->getScore() << std::endl;
+    }
+    else
+    {
+        os << "0" << std::endl;
+    }
+
     os << game.minefield << std::endl;
     return os;
 }
