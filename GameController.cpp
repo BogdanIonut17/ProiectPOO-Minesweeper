@@ -3,12 +3,13 @@
 #include <iostream>
 
 #include "ClassicGame.h"
-#include "CustomGame.h"
 #include "EasyGame.h"
 #include "Exceptions.h"
 #include "HardGame.h"
 #include "MediumGame.h"
+#include "CustomGame.h"
 #include "HighScores.h"
+#include "GameFactory.h"
 
 
 bool GameController::firstRound = true;
@@ -19,16 +20,16 @@ GameController::GameController(std::shared_ptr<Game> mode) : gameMode(std::move(
 {
 }
 
-GameController::GameController(const GameController& other): gameMode(other.gameMode)
-{
-    firstRound = true;
-}
+// GameController::GameController(const GameController& other): gameMode(other.gameMode)
+// {
+//     firstRound = true;
+// }
 
-GameController& GameController::operator=(GameController other)
-{
-    swap(*this, other);
-    return *this;
-}
+// GameController& GameController::operator=(GameController other)
+// {
+//     swap(*this, other);
+//     return *this;
+// }
 
 void GameController::showMenu()
 {
@@ -48,7 +49,12 @@ void GameController::showMenu()
 void GameController::showHighScores()
 {
     std::cout << "\n=== Highscores ===" << std::endl;
-    for (const auto& [name, hscores] : Player::getHighScores())
+    auto highScores = Player::getHighScores();
+    if (highScores.empty())
+    {
+        std::cout << "No highscores registered yet." << std::endl;
+    }
+    for (const auto& [name, hscores] : highScores)
     {
         std::cout << "Player: " << name << std::endl;
         for (const auto& hs : hscores)
@@ -82,6 +88,7 @@ void GameController::showHighScores()
 
 std::shared_ptr<Game> GameController::createGame(const int choice)
 {
+    GameFactory<Game>* f;
     switch (choice)
     {
     case 0:
@@ -89,11 +96,36 @@ std::shared_ptr<Game> GameController::createGame(const int choice)
             std::cout << "\nGoodbye!" << std::endl;
             return nullptr;
         }
-    case 1: return std::make_shared<ClassicGame>();
-    case 2: return std::make_shared<EasyGame>();
-    case 3: return std::make_shared<MediumGame>();
-    case 4: return std::make_shared<HardGame>();
-    case 5: return std::make_shared<CustomGame>();
+    case 1:
+        {
+            // return std::make_shared<ClassicGame>();
+            f = new ClassicGameFactory();
+            break;
+        }
+    case 2:
+        {
+            // return std::make_shared<EasyGame>();
+            f = new EasyGameFactory();
+            break;
+        }
+    case 3:
+        {
+            // return std::make_shared<MediumGame>();
+            f = new MediumGameFactory();
+            break;
+        }
+    case 4:
+        {
+            // return std::make_shared<HardGame>();
+            f = new HardGameFactory();
+            break;
+        }
+    case 5:
+        {
+            // return std::make_shared<CustomGame>();
+            f = new CustomGameFactory();
+            break;
+        }
     case 6:
         {
             if (gameMode && !firstRound)
@@ -127,7 +159,8 @@ std::shared_ptr<Game> GameController::createGame(const int choice)
                 return gameMode;
             }
 
-            std::cout << "\nThis is your first round. Choose a difficulty (1, 2, 3, 4 and 5) or type 0 to exit:" << std::endl;
+            std::cout << "\nThis is your first round. Choose a difficulty (1, 2, 3, 4 and 5) or type 0 to exit:" <<
+                std::endl;
             showMenu();
             int newChoice;
             // std::cin >> newChoice;
@@ -150,7 +183,8 @@ std::shared_ptr<Game> GameController::createGame(const int choice)
                 return game;
             }
 
-            std::cout << "\nThis is your first round. Choose a difficulty (1, 2, 3, 4 and 8) or type 0 to exit:" << std::endl;
+            std::cout << "\nThis is your first round. Choose a difficulty (1, 2, 3, 4 and 8) or type 0 to exit:" <<
+                std::endl;
             showMenu();
             int newChoice;
             // std::cin >> newChoice;
@@ -159,14 +193,28 @@ std::shared_ptr<Game> GameController::createGame(const int choice)
             auto game = createGame(newChoice);
             return game;
         }
-    default: return std::make_shared<ClassicGame>();
+    default:
+        {
+            // return std::make_shared<ClassicGame>();
+            f = new ClassicGameFactory();
+            break;
+        }
     }
+    gameMode = f->createGame();
+    delete f;
+    return gameMode;
 }
 
 // void GameController::setGameMode(const std::shared_ptr<Game>& game)
 // {
 //     gameMode = game;
 // }
+
+GameController& GameController::getInstance()
+{
+    static GameController instance;
+    return instance;
+}
 
 void GameController::run()
 {

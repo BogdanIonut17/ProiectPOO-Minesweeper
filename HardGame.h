@@ -25,6 +25,4 @@ private:
 };
 
 
-
-
 #endif //HARDGAME_H

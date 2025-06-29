@@ -18,21 +18,21 @@ class GameController
 
     // void setGameMode(const std::shared_ptr<Game>& game);
 
-public:
     GameController();
 
     explicit GameController(std::shared_ptr<Game> mode);
 
-    GameController(const GameController& other);
+    GameController(const GameController& other) = delete;
 
-    GameController& operator=(GameController other);
+    GameController& operator=(GameController other) = delete;
+
+public:
+    static GameController& getInstance();
 
     friend void swap(GameController& lhs, GameController& rhs) noexcept;
 
     void run();
 };
-
-
 
 
 #endif //GAMECONTROLLER_H

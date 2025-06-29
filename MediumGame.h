@@ -24,6 +24,4 @@ private:
 };
 
 
-
-
 #endif //MEDIUMGAME_H

@@ -1,6 +1,6 @@
 # MineMaster
 
-Classic Minesweeper game developed using C++ and the SFML library for GUI.
+Classic Minesweeper game developed using C++ and played in the terminal.
 
 MineMaster features an interactive grid-based gameplay where players must uncover safe cells while avoiding hidden mines
 to win the game.
@@ -9,12 +9,35 @@ to win the game.
 
 - The board is divided into cells, with mines randomly distributed.
 - Cells can be unrevealed, revealed or flagged.
-  - An unrevealed cell is blank, and left-clicking on it will expose it.
+  - An unrevealed cell is blank, and you can expose it.
   - If you reveal a mine, you lose the game! Else, you will see the number of mines adjacent to it or a blank cell,
     revealing all adjacent non-mined cells.
-  - You can also mark cells you suspect of having a mine by right-clicking them, but you can still reveal them, so be
-    careful!
+  - You can also mark cells you suspect of having a mine by flagging them.
+
+## Chord Reveal
+
+- When in doubt about where the mines next to a revealed cell are, try Chording.
+  - Place as many flags as the number on the cell and reveal that already revealed cell to trigger the Chording
+    mechanic.
+  - This will reveal all the cells next to it and aren't flagged
+- Be careful, though, if you didn't place a flag on a mine cell, you lose!
+
+## Bonus feature: Shuffle Mines
+
+- Don't like how the mines are laid out? You can shuffle the board, placing each uncovered mine in a different spot,
+  while keeping the revealed mines as they are.
 - You win when you reveal all the cells that aren't mines!
+- This game can be played regardless of your skill level, with difficulties ranging from easy to hard and different
+  board layouts:
+  - the classic 8x8 board with 9 mines or a custom board.
+  - After a round, you can choose to play another on the previous difficulty or replay it with the same board layout.
+
+## Terminal Commands
+
+- To reveal a cell, type `r x y` in the terminal (where x, y are its coordinates starting from 0), when prompted to
+  enter a move.
+- To flag a cell, type `f x y`.
+- To shuffle the mines, type `s`.
 
 ### Tema 0
 
@@ -139,10 +162,3 @@ Vezi și [`scripts/cmake.sh`](scripts/cmake.sh).
 
 Observație: folderele `build/` și `install_dir/` sunt adăugate în fișierul `.gitignore` deoarece
 conțin fișiere generate și nu ne ajută să le versionăm.
-
-
-## Resurse
-
-- [SFML](https://github.com/SFML/SFML/tree/2.6.1) (Zlib)
-  - [OpenAL](https://openal-soft.org/) (LGPL): din cauza licenței, trebuie distribuită ca shared library
-- adăugați trimiteri către resursele externe care v-au ajutat sau pe care le-ați folosit

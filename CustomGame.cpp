@@ -6,6 +6,7 @@
 #include "Exceptions.h"
 #include <iostream>
 
+#include "GameFactory.h"
 #include "HighScores.h"
 
 
@@ -28,8 +29,11 @@ void CustomGame::updateHighScore()
     if (getPlayerScore() > customHighScore)
     {
         customHighScore = getPlayerScore();
-        const auto hs = std::make_shared<CustomHighScore>(getHighScore());
-        getPlayer()->addOrUpdateHighScore(hs);
+        const GameFactory<HighScore>* factory = new CustomHighscoreFactory();
+        getPlayer()->addOrUpdateHighScore(factory->createHighScore(getHighScore()));
+        delete factory;
+        // const auto hs = std::make_shared<CustomHighScore>(getHighScore());
+        // getPlayer()->addOrUpdateHighScore(hs);
     }
 }
 

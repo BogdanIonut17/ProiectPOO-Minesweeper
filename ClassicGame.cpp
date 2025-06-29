@@ -6,6 +6,7 @@
 
 #include <iostream>
 
+#include "GameFactory.h"
 #include "HighScores.h"
 
 
@@ -25,8 +26,11 @@ void ClassicGame::updateHighScore()
     if (getPlayerScore() > classicHighScore)
     {
         classicHighScore = getPlayerScore();
-        const auto hs = std::make_shared<ClassicHighScore>(getHighScore());
-        getPlayer()->addOrUpdateHighScore(hs);
+        const GameFactory<HighScore>* factory = new ClassicHighscoreFactory();
+        getPlayer()->addOrUpdateHighScore(factory->createHighScore(getHighScore()));
+        delete factory;
+        // const auto hs = std::make_shared<ClassicHighScore>(getHighScore());
+        // getPlayer()->addOrUpdateHighScore(hs);
     }
 }
 
